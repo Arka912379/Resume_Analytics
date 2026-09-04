@@ -170,7 +170,7 @@ function CompactSignupHero({ className, density = 'compact' }) {
       <div
         className={joinClassNames(
           'relative z-10',
-          isProfile ? 'pl-[16px] max-[1100px]:pl-[12px]' : 'pl-[22px] max-[1100px]:pl-[16px]',
+          isProfile ? 'pl-[16px] max-[1100px]:pl-[12px]' : 'pl-[90px] max-[1100px]:pl-[16px]',
         )}
       >
         <div className={isProfile ? profileSignupContentBoxClassName : compactSignupContentBoxClassName}>
@@ -223,10 +223,6 @@ function CompactSignupHero({ className, density = 'compact' }) {
       <div
         aria-hidden="true"
         className="pointer-events-none absolute bottom-[76px] left-[458px] h-[32px] w-[32px] border-[3px] border-[#111] bg-[#f15c82] shadow-[4px_4px_0_#111] max-[1100px]:left-[380px] max-[720px]:hidden"
-      />
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute right-0 top-0 h-[176px] w-[232px] bg-[#6f34e1] shadow-[-8px_8px_0_#111] max-[1100px]:w-[196px] max-[720px]:h-[138px] max-[720px]:w-[176px]"
       />
       <div
         aria-hidden="true"
