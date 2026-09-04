@@ -5,6 +5,7 @@ import BrutalistButton from './BrutalistButton.jsx'
 import GoogleButton from './GoogleButton.jsx'
 import InputField from './InputField.jsx'
 import PasswordField from './PasswordField.jsx'
+import { useAuth } from '../contexts/AuthContext.jsx'
 
 const initialValues = {
   email: '',
@@ -32,6 +33,7 @@ function validate(values) {
 }
 
 export default function LoginForm() {
+    const { user, googleSignIn, githubSignIn, setLocaluser } = useAuth();
   const [values, setValues] = useState(initialValues)
   const [touched, setTouched] = useState({
     email: false,
@@ -65,7 +67,10 @@ export default function LoginForm() {
       [name]: true,
     }))
   }
-
+const  handlegoolebtnclick=async()=>{
+   const data = await googleSignIn();
+      console.log(data.user.email)
+}
   const handleSubmit = (event) => {
     event.preventDefault()
     setAttemptedSubmit(true)
@@ -146,7 +151,7 @@ export default function LoginForm() {
           <span className="h-[2px] flex-1 bg-[rgba(17,17,17,0.55)]" />
         </div>
 
-        <GoogleButton text="Continue with Google" />
+       <button onClick={handlegoolebtnclick}><GoogleButton text="Continue with Google" /></button> 
 
         <p className="mt-3 text-center text-[0.88rem] max-[720px]:mt-[11px] max-[720px]:text-[0.86rem] max-[560px]:mt-[9px] max-[560px]:text-[0.8rem]">
           Don&apos;t have an account?{' '}
