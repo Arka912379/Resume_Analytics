@@ -19,28 +19,25 @@ initializeApp({
     })
 });
 const verifyUser = async (token, authType) => {
+    let email;
 
     if (authType == "firebase") {
         const decoded = await getAuth().verifyIdToken(token);
-        const email = decoded.email;
-        const user = await User.findOne({ email }).select('-password').lean();
-        if (!user) {
-            return false;
-
-        }
-        return true
-
-    }
-    if (authType == "normal") {
+        console.log(decoded);
+        email = decoded.email;
+    } else if (authType == "normal") {
         const decoded = jwt.verify(token, process.env.JWT_SERECT)
         console.log(decoded);
-        const email = decoded.email;
-        const user = await User.findOne({ email }).select('-password').lean();
-        if (!user) {
-            return false
-        }
-        return true
-
+        email = decoded.email;
+    } else{
+        return false;
     }
+
+    const user = await User.findOne({ email }).select("-password").lean();
+    if (!user) {
+        return false;
+    }
+    return user;
 }
+
 export default verifyUser;

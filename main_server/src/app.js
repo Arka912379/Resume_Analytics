@@ -19,10 +19,12 @@ import errorHandler from "./middlewares/error.middleware.js";
 import AuthRouter from "./routes/auth.route.js";
 import resumeRouter from "./routes/resume.route.js";
 import historyRouter from "./routes/history.route.js";
+import dashbordRouter from "./routes/dashbord.route.js";
 
 app.use("/api/v1/auth",AuthRouter)
 app.use("/api/v1/resume",resumeRouter)
 app.use("/api/v1/history",historyRouter)
+app.use("/api/v1/dashboard",dashbordRouter)
 
 app.use(errorHandler)
 
