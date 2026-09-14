@@ -94,11 +94,16 @@ const generateInterviewQuestions = asyncHandler(async (req, res, next) => {
             );
             interview = created[0];
 
-            await History.create({
-                userId: user._id,
-                interviewId: interview._id,
-                typeOfHistory: 'interview',
-            }, { session });
+            await History.create(
+                [
+                    {
+                        userId: user._id,
+                        interviewId: interview._id,
+                        typeOfHistory: 'interview',
+                    },
+                ],
+                { session }
+            );
 
             const questionDocs = questionsPayload.map((q, idx) => ({
                 interviewId: interview._id,
