@@ -1,15 +1,15 @@
-import app from "./src/app.js";
 import "./src/configs/env.js";
 
 import connectDB from "./src/db/db.js";
-import {server} from "./src/socket/socket.js";
-const PORT = process.env.PORT || 8000;
+import app from "./src/app.js";
+
+const PORT = process.env.PORT || 5000;
 
 connectDB().then(() => {
-    server.on("error", (err)=>{
+    app.on("error", (err)=>{
         console.log(err)
     })
-    server.listen(PORT,()=>{
+    app.listen(PORT,()=>{
         console.log("server running",PORT)
     })
 }).catch((err) => {

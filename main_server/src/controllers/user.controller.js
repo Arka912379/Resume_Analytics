@@ -7,7 +7,9 @@ import { generateReferenceCode } from "../utils/referenceCodeGenFun.js";
 import OTP from "../models/otp.model.js";
 import { uploadToImageKit } from "../utils/imageKit.js";
 import { options } from "../constants.js";
-const sendOtp = asyncHandler(async (res, req) => {
+import bcrypt from "bcrypt";
+const sendOtp = asyncHandler(async (req, res) => {
+    console.log(req.body)
     const { email } = req.body;
     if (!email) {
         throw new ApiError(400, "Email is required.")
@@ -47,6 +49,7 @@ const verifyOtp = asyncHandler(async (req, res) => {
 })
 
 const register = asyncHandler(async (req, res) => {
+    console.log(req.body);
     const { fullName, email, password, bio } = req.body;
     if (!fullName || !bio || !password || !email) {
         throw new ApiError(400, 'All details are not found');
@@ -106,4 +109,32 @@ const login = asyncHandler(async (req, res) => {
         )
 
 })
-export { sendOtp, verifyOtp , register , login}
+const findUserDataForForgetPassword = asyncHandler(async (req, res) => {
+    const { email } = req.body;
+    if (!email) {
+        throw new ApiError(400, 'Phone number is required.')
+    }
+    const findTheUserDataBoy = await User.findOne({ email }).select("-password").lean();
+    if (!findTheUserDataBoy) {
+        throw new ApiError(404, 'User not found')
+    }
+    if (findTheUserDataBoy) {
+        return res.status(200).json(new ApiResponse(200, findTheUserDataBoy, 'Email retrive'))
+    }
+})
+const forgetPassword = asyncHandler(async (req, res) => {
+    const { newPassword, email } = req.body;
+    if (!newPassword || !email) {
+        throw new ApiError(400, 'All data not found')
+    }
+    const userDataBoy = await User.findOne({ email }).lean();
+    if (!userDataBoy) {
+        throw new ApiError(404, 'Invalid user email')
+    }
+    const slat = await bcrypt.genSalt(12);
+    const haspass = await bcrypt.hash(newPassword, slat);
+    await User.findByIdAndUpdate(userDataBoy._id, { $set: { password: haspass } }, { new: true })
+    return res.status(200).json(new ApiResponse(200, null, 'Password changed Successfully'))
+
+})
+export { sendOtp, verifyOtp, register, login ,findUserDataForForgetPassword ,forgetPassword}

@@ -15,6 +15,11 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    imageUrl:{
+        type: String,
+        required: true,
+
+    },
     password:{
         type: String,
         required: true,
@@ -25,3 +30,14 @@ const userSchema = new mongoose.Schema({
 
 const User = mongoose.model("User", userSchema);
 export default User;
+
+/*
+    image
+    name
+    email
+    gender
+    bio
+    mobile no
+    dob
+    password
+*/

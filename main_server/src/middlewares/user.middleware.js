@@ -1,12 +1,12 @@
 import jwt from "jsonwebtoken"
-import admin from "firebase-admin";
-import dotenv from "dotenv";
 import User from "../models/user.model.js";
 import { ApiError } from "../utils/apiError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
-dotenv.config()
-admin.initializeApp({
-    credential: admin.credential.cert({
+import { initializeApp, cert } from "firebase-admin/app";
+import { getAuth } from "firebase-admin/auth";
+
+initializeApp({
+    credential: cert({
         type: process.env.FIREBASE_TYPE,
         project_id: process.env.FIREBASE_PROJECT_ID,
         private_key_id: process.env.FIREBASE_PRIVATE_KEY_ID,
@@ -26,11 +26,11 @@ const verifyUser = asyncHandler(async (req, res, next) => {
     console.log(token);
     console.log(token2);
     if (token) {
-        const decoded = await admin.auth().verifyIdToken(token);
+        const decoded = await getAuth().verifyIdToken(token);
         const email = decoded.email;
         const user = await User.findOne({ email }).select('-password').lean();
         if (!user) {
-            throw new ApiError(401, 'User not found');
+            throw new ApiError(404, 'User not found');
 
         }
         req.user = user;
@@ -44,7 +44,7 @@ const verifyUser = asyncHandler(async (req, res, next) => {
         const email = decoded.email;
         const user = await User.findOne({ email }).select('-password').lean();
         if (!user) {
-            throw new ApiError(401, 'User not found');
+            throw new ApiError(404, 'User not found');
 
         }
         req.user = user;

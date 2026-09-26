@@ -6,3 +6,7 @@ client/.env
 
 ai_server/node_modules
 ai_server/.env
+
+
+ai_server2/*
+client2/*
