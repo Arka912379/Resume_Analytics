@@ -37,10 +37,10 @@ const cardInnerClassName = 'relative z-10 flex flex-1 flex-col'
 const profileCardInnerClassName = 'relative z-10 flex flex-1 flex-col'
 
 const headingClassName =
-  'relative z-10 mt-[5px] mb-3 w-fit border-[3px] border-[#111] bg-[#6f4be4] px-[14px] py-[8px] text-[clamp(1.65rem,2.1vw,2.35rem)] font-black leading-none tracking-[-0.09em] text-[#111] shadow-[5px_5px_0_#111] max-[720px]:mb-[12px] max-[720px]:px-[14px] max-[720px]:py-[8px] max-[720px]:text-[1.55rem] max-[560px]:text-[1.35rem] max-[560px]:shadow-[4px_4px_0_#111]'
+  'relative z-10 mt-[20px] mb-5 w-fit border-[3px] border-[#111] bg-[#6f4be4] px-[14px] py-[8px] text-[clamp(1.65rem,2.1vw,2.35rem)] font-black leading-none tracking-[-0.09em] text-[#111] shadow-[5px_5px_0_#111] max-[720px]:mb-[12px] max-[720px]:px-[14px] max-[720px]:py-[8px] max-[720px]:text-[1.55rem] max-[560px]:text-[1.35rem] max-[560px]:shadow-[4px_4px_0_#111]'
 
 const subtitleClassName =
-  'relative z-10 mb-6 text-[0.9rem] leading-[1.45] text-[#111] max-[720px]:mb-5 max-[720px]:text-[0.86rem] max-[560px]:mb-4 max-[560px]:text-[0.82rem]'
+  'relative z-10 mb-8 text-[0.9rem] leading-[1.45] text-[#111] max-[720px]:mb-5 max-[720px]:text-[0.86rem] max-[560px]:mb-4 max-[560px]:text-[0.82rem]'
 
 const profileHeadingClassName =
   'relative z-10 mt-[3px] mb-2 w-fit border-[3px] border-[#111] bg-[#6f4be4] px-[11px] py-[6px] text-[clamp(1.28rem,1.65vw,1.95rem)] font-black leading-none tracking-[-0.09em] text-[#111] shadow-[4px_4px_0_#111] max-[720px]:mb-[10px] max-[720px]:px-[11px] max-[720px]:py-[6px] max-[720px]:text-[1.28rem] max-[560px]:text-[1.16rem] max-[560px]:shadow-[3px_3px_0_#111]'
@@ -57,7 +57,7 @@ const dividerTextClassName =
   'text-[0.86rem] font-black tracking-[-0.04em] text-[#111] max-[560px]:text-[0.78rem]'
 
 const loginRowClassName =
-  'mt-3 flex items-center justify-center gap-3 max-[560px]:mt-2.5 max-[560px]:gap-2.5'
+  'flex items-center justify-center gap-3 pt-10 max-[560px]:gap-2.5 max-[560px]:pt-8'
 
 const loginTextClassName =
   'text-[0.84rem] leading-none text-[#111] max-[560px]:text-[0.76rem]'
@@ -91,9 +91,6 @@ const profileAccentBlackDotsClassName =
 
 const profileTopLeftAccentClassName =
   'pointer-events-none absolute left-0 top-[126px] h-[166px] w-[32px] bg-[#6b44e6] shadow-[5px_5px_0_rgba(17,17,17,0.14)] max-[1100px]:top-[116px] max-[1100px]:h-[146px] max-[1100px]:w-[30px] max-[720px]:hidden'
-
-const profileTopRightAccentClassName =
-  'pointer-events-none absolute right-0 top-0 h-[176px] w-[232px] bg-[#6f35e1] shadow-[-8px_8px_0_#111] max-[1100px]:w-[194px] max-[720px]:h-[142px] max-[720px]:w-[158px]'
 
 const profileTopRightDotsClassName =
   'pointer-events-none absolute right-[24px] top-[12px] h-[52px] w-[52px] bg-[radial-gradient(circle,_#111_4px,_transparent_4px)] [background-size:16px_16px] opacity-95 max-[720px]:h-[42px] max-[720px]:w-[42px] max-[720px]:[background-size:14px_14px]'
@@ -130,9 +127,6 @@ const accentBlackDotsClassName =
 
 const topLeftAccentClassName =
   'pointer-events-none absolute left-0 top-[160px] h-[218px] w-[40px] bg-[#6b44e6] shadow-[6px_6px_0_rgba(17,17,17,0.14)] max-[1100px]:top-[144px] max-[1100px]:h-[188px] max-[1100px]:w-[36px] max-[720px]:hidden'
-
-const topRightAccentClassName =
-  'pointer-events-none absolute right-0 top-0 h-[190px] w-[244px] bg-[#6f35e1] shadow-[-8px_8px_0_#111] max-[1100px]:w-[214px] max-[720px]:h-[154px] max-[720px]:w-[180px]'
 
 const topRightDotsClassName =
   'pointer-events-none absolute right-[30px] top-[14px] h-[66px] w-[66px] bg-[radial-gradient(circle,_#111_4px,_transparent_4px)] [background-size:18px_18px] opacity-95 max-[720px]:h-[52px] max-[720px]:w-[52px] max-[720px]:[background-size:16px_16px]'
@@ -381,10 +375,6 @@ export default function SignUpPage() {
     <div className={isProfileStep ? profilePageClassName : pageClassName}>
       <div
         aria-hidden="true"
-        className={isProfileStep ? profileTopRightAccentClassName : topRightAccentClassName}
-      />
-      <div
-        aria-hidden="true"
         className={isProfileStep ? profileTopRightDotsClassName : topRightDotsClassName}
       />
       <div
@@ -439,10 +429,16 @@ export default function SignUpPage() {
           className={isProfileStep ? profileSignUpSectionClassName : signUpSectionClassName}
           aria-label="Sign up area"
         >
-          <HeroPanel variant="signup" density={isProfileStep ? 'profile' : 'compact'} />
+          <div className="max-[1100px]:translate-x-0 translate-x-[14px]">
+            <HeroPanel variant="signup" density={isProfileStep ? 'profile' : 'compact'} />
+          </div>
 
           <BrutalistCard
-            className={isProfileStep ? 'w-full !p-2.5 !shadow-[5px_5px_0_#111]' : 'w-full'}
+            className={
+              isProfileStep
+                ? 'w-full !p-2.5 !shadow-[5px_5px_0_#111]'
+                : 'w-full -translate-x-[54px] max-[1000px]:translate-x-0'
+            }
             density={isProfileStep ? 'profile' : 'compact'}
           >
             <div className={isProfileStep ? profileCardInnerClassName : cardInnerClassName}>
@@ -459,7 +455,11 @@ export default function SignUpPage() {
 
               {!isProfileStep ? (
                 <>
-                  <GoogleButton text="Sign up with Google" density="compact" />
+                  <GoogleButton
+                    text="Sign up with Google"
+                    density="compact"
+                    className="min-h-[48px] max-[560px]:min-h-[44px]"
+                  />
 
                   <div className={dividerClassName} aria-hidden="true">
                     <span className={dividerLineClassName} />
@@ -470,24 +470,44 @@ export default function SignUpPage() {
               ) : null}
 
               <form className="relative z-10 flex flex-1 flex-col" onSubmit={handleSubmit} noValidate>
-                {step === 'otp' ? (
-                  <div className="mb-[8px] max-[560px]:mb-2">
-                    <div className={changeEmailRowClassName}>
-                      <label
-                        htmlFor="email"
-                        className={changeEmailLabelClassName}
-                      >
-                        Email
-                      </label>
-                      <button
-                        type="button"
-                        onClick={handleChangeEmail}
-                        className={changeEmailLinkClassName}
-                      >
-                        Change Email
-                      </button>
-                    </div>
+                <div className={isProfileStep ? 'flex flex-1 flex-col' : 'flex flex-col gap-[14px] max-[560px]:gap-3'}>
+                  {step === 'otp' ? (
+                    <div className="mb-[8px] max-[560px]:mb-2">
+                      <div className={changeEmailRowClassName}>
+                        <label
+                          htmlFor="email"
+                          className={changeEmailLabelClassName}
+                        >
+                          Email
+                        </label>
+                        <button
+                          type="button"
+                          onClick={handleChangeEmail}
+                          className={changeEmailLinkClassName}
+                        >
+                          Change Email
+                        </button>
+                      </div>
 
+                      <InputField
+                        id="email"
+                        name="email"
+                        label="Email"
+                        type="email"
+                        inputMode="email"
+                        autoComplete="email"
+                        placeholder="Enter your email"
+                        value={value.email}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        icon={Mail}
+                      error={showEmailError ? errors.email : ''}
+                      density="compact"
+                      labelClassName="sr-only"
+                        className="min-h-[52px] max-[560px]:min-h-[46px]"
+                      />
+                    </div>
+                  ) : step === 'email' ? (
                     <InputField
                       id="email"
                       name="email"
@@ -500,129 +520,117 @@ export default function SignUpPage() {
                       onChange={handleChange}
                       onBlur={handleBlur}
                       icon={Mail}
-                      error={showEmailError ? errors.email : ''}
-                      density="compact"
-                      labelClassName="sr-only"
-                    />
-                  </div>
-                ) : step === 'email' ? (
-                  <InputField
-                    id="email"
-                    name="email"
-                    label="Email"
-                    type="email"
-                    inputMode="email"
-                    autoComplete="email"
-                    placeholder="Enter your email"
-                    value={value.email}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    icon={Mail}
                     error={showEmailError ? errors.email : ''}
                     density="compact"
+                    className="min-h-[52px] max-[560px]:min-h-[46px]"
                   />
-                ) : (
-                  <>
-                    <ProfilePhotoUploader
-                      previewUrl={profilePhotoPreview}
-                      selectedFileName={profilePhoto?.name}
-                      onChange={handleProfilePhotoChange}
-                      density="profile"
-                    />
+                  ) : (
+                    <>
+                      <ProfilePhotoUploader
+                        previewUrl={profilePhotoPreview}
+                        selectedFileName={profilePhoto?.name}
+                        onChange={handleProfilePhotoChange}
+                        density="profile"
+                      />
 
-                    <InputField
-                      id="fullName"
-                      name="fullName"
-                      label="Full Name"
-                      type="text"
-                      autoComplete="name"
-                      placeholder="Enter your full name"
-                      value={value.fullName}
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      icon={User}
-                      error={showFullNameError ? profileErrors.fullName : ''}
-                      density="profile"
-                    />
+                      <InputField
+                        id="fullName"
+                        name="fullName"
+                        label="Full Name"
+                        type="text"
+                        autoComplete="name"
+                        placeholder="Enter your full name"
+                        value={value.fullName}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        icon={User}
+                        error={showFullNameError ? profileErrors.fullName : ''}
+                        density="profile"
+                      />
 
-                    <InputField
-                      id="profile-email"
-                      name="email"
-                      label="Email"
-                      type="email"
-                      inputMode="email"
-                      autoComplete="email"
-                      placeholder="Enter your email"
-                      value={value.email}
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      icon={Mail}
-                      endIcon={Lock}
-                      readOnly
-                      error={showProfileEmailError ? profileErrors.email : ''}
-                      density="profile"
-                    />
+                      <InputField
+                        id="profile-email"
+                        name="email"
+                        label="Email"
+                        type="email"
+                        inputMode="email"
+                        autoComplete="email"
+                        placeholder="Enter your email"
+                        value={value.email}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        icon={Mail}
+                        endIcon={Lock}
+                        readOnly
+                        error={showProfileEmailError ? profileErrors.email : ''}
+                        density="profile"
+                      />
 
-                    <PasswordField
-                      id="password"
-                      name="password"
-                      label="Password"
-                      autoComplete="new-password"
-                      placeholder="Create a password"
-                      value={value.password}
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      error={showPasswordError ? profileErrors.password : ''}
-                      density="profile"
-                    />
+                      <PasswordField
+                        id="password"
+                        name="password"
+                        label="Password"
+                        autoComplete="new-password"
+                        placeholder="Create a password"
+                        value={value.password}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        error={showPasswordError ? profileErrors.password : ''}
+                        density="profile"
+                      />
 
-                    <PasswordField
-                      id="confirmPassword"
-                      name="confirmPassword"
-                      label="Confirm Password"
-                      autoComplete="new-password"
-                      placeholder="Confirm your password"
-                      value={value.confirmPassword}
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      error={showConfirmPasswordError ? profileErrors.confirmPassword : ''}
-                      density="profile"
-                    />
-                  </>
-                )}
+                      <PasswordField
+                        id="confirmPassword"
+                        name="confirmPassword"
+                        label="Confirm Password"
+                        autoComplete="new-password"
+                        placeholder="Confirm your password"
+                        value={value.confirmPassword}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        error={showConfirmPasswordError ? profileErrors.confirmPassword : ''}
+                        density="profile"
+                      />
+                    </>
+                  )}
 
-                {step === 'otp' ? (
-                  <>
-                    <OtpInput
-                      value={otp}
-                      onChange={handleOtpChange}
-                      onComplete={handleOtpComplete}
-                      helperText="Enter the 6-digit code sent to your email"
-                      error={otpMessageTone === 'error' ? otpMessage : ''}
-                      className="mb-3"
-                    />
+                  {step === 'otp' ? (
+                    <>
+                      <OtpInput
+                        value={otp}
+                        onChange={handleOtpChange}
+                        onComplete={handleOtpComplete}
+                        helperText="Enter the 6-digit code sent to your email"
+                        error={otpMessageTone === 'error' ? otpMessage : ''}
+                        className="mb-1"
+                      />
 
-                    {otpMessage && otpMessageTone === 'success' ? (
-                      <p
-                        className="mb-3 text-[0.74rem] font-bold text-[#127a3d] max-[560px]:text-[0.7rem]"
-                        role="status"
-                        aria-live="polite"
-                      >
-                        {otpMessage}
-                      </p>
-                    ) : null}
-                  </>
-                ) : null}
+                      {otpMessage && otpMessageTone === 'success' ? (
+                        <p
+                          className="text-[0.74rem] font-bold text-[#127a3d] max-[560px]:text-[0.7rem]"
+                          role="status"
+                          aria-live="polite"
+                        >
+                          {otpMessage}
+                        </p>
+                      ) : null}
+                    </>
+                  ) : null}
 
-                <BrutalistButton
-                  type="submit"
-                  variant="primary"
-                  icon={<ArrowRight size={isProfileStep ? 20 : 24} aria-hidden="true" />}
-                  density={isProfileStep ? 'profile' : 'compact'}
-                  className={isProfileStep ? profileButtonClassName : 'mb-2'}
-                >
-                  {sendloder ? <BrutalistBlocksLoader /> : <span className="font-black">{buttonLabel}</span>}
-                </BrutalistButton>
+                  <BrutalistButton
+                    type="submit"
+                    variant="primary"
+                    icon={<ArrowRight size={isProfileStep ? 20 : 24} aria-hidden="true" />}
+                    density={isProfileStep ? 'profile' : 'compact'}
+                    className={
+                      isProfileStep
+                        ? profileButtonClassName
+                        : 'mb-0 min-h-[52px] max-[560px]:min-h-[48px]'
+                    }
+                  >
+                    <span className="font-black">{buttonLabel}</span>
+                  </BrutalistButton>
+                </div>
 
                 {isProfileStep ? (
                   <>
