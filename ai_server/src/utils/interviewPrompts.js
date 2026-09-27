@@ -256,11 +256,18 @@ export const buildJobDescriptionAnalysisPrompt = ({ resume, jobDescription }) =>
         - "title": the job title, ONLY if it is actually present/identifiable in the job description text (e.g. a heading like "Senior Backend Engineer"). If the text does not clearly contain a job title, use null. Do not guess or invent one.
         - "company": the hiring company's name, ONLY if it is actually present/identifiable in the job description text. If the text does not mention a company name, use null. Do not guess or invent one.
         - "matchScore": an overall match score from 0 to 100 representing how well the resume fits the job description, considering skills, experience, projects, and education together.
-        - "matchedKeywords": array of specific skills/technologies/requirements mentioned in the job description that ARE clearly present in the resume.
-        - "missingKeywords": array of specific skills/technologies/requirements mentioned in the job description that are NOT present in the resume.
-        - "suggestions": array of specific, actionable suggestions for how the candidate could improve their resume or profile to better match this job description (e.g. skills to learn, projects to add, how to phrase existing experience).
+        - "summary": a short 2-3 sentence overview of the resume's fit for this job, written like a brief expert verdict (e.g. "Your resume shows relevant skills and experience. Address the suggested improvements to further increase your chances."). This is shown directly to the candidate as the headline takeaway.
+        - "matchedKeywords": array of objects, one per specific skill/technology/requirement mentioned in the job description that IS clearly present in the resume. Each object has:
+        - "title": a short label for the matched keyword/skill (e.g. "Relevant Technical Skills").
+        - "description": one short sentence explaining what matched and why it's a strength for this job.
+        - "missingKeywords": array of objects, one per specific skill/technology/requirement mentioned in the job description that is NOT present in the resume. Each object has:
+        - "title": a short label for the missing keyword/gap (e.g. "Lack of Relevant Keywords").
+        - "description": one short sentence naming the specific missing skill(s)/keyword(s) and why the job description expects them.
+        - "suggestions": array of objects, one per specific, actionable improvement the candidate could make to better match this job description. Each object has:
+        - "title": a short label for the suggestion (e.g. "Add a Strong Summary").
+        - "description": one short sentence with the concrete action to take (e.g. mention a specific skill to learn, a project to add, certifications to get, or how to rephrase existing experience).
         
-        Be honest and precise — do not inflate the match score, and do not invent keywords, titles, or company names that are not actually present in the given text.
+        Be honest and precise — do not inflate the match score, and do not invent keywords, titles, or company names that are not actually present in the given text. Keep every "description" to a single concise sentence, not a paragraph.
         
         Output ONLY valid JSON matching the schema below. No markdown fences, no commentary.
         
@@ -269,18 +276,19 @@ export const buildJobDescriptionAnalysisPrompt = ({ resume, jobDescription }) =>
         "title": "string | null",
         "company": "string | null",
         "matchScore": number,
-        "matchedKeywords": ["string"],
-        "missingKeywords": ["string"],
-        "suggestions": ["string"]
+        "summary": "string",
+        "matchedKeywords": [{ "title": "string", "description": "string" }],
+        "missingKeywords": [{ "title": "string", "description": "string" }],
+        "suggestions": [{ "title": "string", "description": "string" }]
         }
     `;
-
+ 
     const userPrompt = `Job description (raw text, exactly as pasted by the user):
         ${jobDescription}
         
         Candidate resume data (JSON):
         ${JSON.stringify(resume?.parsedData || {}, null, 2)}
     `;
-
+ 
     return { systemPrompt, userPrompt };
 };

@@ -30,15 +30,28 @@ const jobDescriptionAnalysisSchema = new Schema(
             required: true,
         },
 
+        summary:{
+            type: String,
+        },
+
         atsScore: {
             type: Number,
             required: false,
         },
 
-        matchedKeywords: [String],
-        missingKeywords: [String],
+        matchedKeywords: [{
+            title: String,
+            description: String,
+        }],
+        missingKeywords: [{
+            title: String,
+            description: String,
+        }],
 
-        suggestions: [String],
+        suggestions: [{
+            title: String,
+            description: String,
+        }],
     },
     { timestamps: true }
 );
