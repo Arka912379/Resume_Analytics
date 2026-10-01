@@ -8,6 +8,7 @@ import OTP from "../models/otp.model.js";
 import { uploadToImageKit } from "../utils/imageKit.js";
 import { options } from "../constants.js";
 import bcrypt from "bcrypt";
+import StrikeCount from "../models/strikeCount.model.js";
 const sendOtp = asyncHandler(async (req, res) => {
     console.log(req.body)
     const { email } = req.body;
@@ -80,7 +81,11 @@ const register = asyncHandler(async (req, res) => {
         password: haspass
     })
     await newuser.save();
-    return res.status(201).json(new ApiResponse(201, null, 'User account is created'))
+    const newStrikeCount = new StrikeCount({
+        userId: newuser._id,
+    })
+    await newStrikeCount.save();
+    return res.status(201).json(new ApiResponse(201, null, 'User account is created.'))
 })
 
 const login = asyncHandler(async (req, res) => {
@@ -137,4 +142,58 @@ const forgetPassword = asyncHandler(async (req, res) => {
     return res.status(200).json(new ApiResponse(200, null, 'Password changed Successfully'))
 
 })
-export { sendOtp, verifyOtp, register, login ,findUserDataForForgetPassword ,forgetPassword}
+
+const userStrikeCount = asyncHandler(async (req, res) => {
+
+    const userdata = req.user;
+
+    const strikeInfo = await StrikeCount
+        .findOne({ userId: userdata._id })
+        .lean();
+
+    if (!strikeInfo) {
+        return res.status(404).json(
+            new ApiResponse(404, null, "Strike information not found.")
+        );
+    }
+
+    const currentDate = new Date();
+
+    const calculateDay = Math.floor(
+        (currentDate - strikeInfo.strikeStartDate) /
+        (1000 * 60 * 60 * 24)
+    );
+
+    if (calculateDay === strikeInfo.strikeCount) {
+
+        await StrikeCount.findByIdAndUpdate(
+            strikeInfo._id,
+            { $inc: { strikeCount: 1 } }
+        );
+
+    } else {
+
+        await StrikeCount.findByIdAndUpdate(
+            strikeInfo._id,
+            {
+                strikeCount: 1,
+                strikeStartDate: currentDate
+            }
+        );
+    }
+
+    const updatedStrike = await StrikeCount
+        .findOne({ userId: userdata._id })
+        .select("strikeCount -_id")
+        .lean();
+
+    return res.status(200).json(
+        new ApiResponse(
+            200,
+            updatedStrike.strikeCount,
+            "Strike has been updated."
+        )
+    );
+});
+
+export { sendOtp, verifyOtp, register, login, findUserDataForForgetPassword, forgetPassword , userStrikeCount}
