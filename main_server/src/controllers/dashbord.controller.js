@@ -3,6 +3,7 @@ import { ApiResponse } from '../utils/apiResponse.js';
 import { ApiError } from '../utils/apiError.js';
 import User from '../models/user.model.js';
 import mongoose from 'mongoose';
+import StrikeCount from '../models/strikeCount.model.js';
 
 const getTotalInterviewsCount = asyncHandler(async (req, res) => {
     const userId = req.user._id;
@@ -116,7 +117,65 @@ const getAverageInterviewScore = asyncHandler(async (req, res) => {
     );
 });
 
+const userStrikeCount = asyncHandler(async (req, res) => {
+
+    const userdata = req.user;
+
+    const strikeInfo = await StrikeCount
+        .findOne({ userId: userdata._id })
+        .lean();
+
+    if (!strikeInfo) {
+        return res.status(404).json(
+            new ApiResponse(404, null, "Strike information not found.")
+        );
+    }
+
+    const currentDate = new Date();
+
+    const calculateDay = Math.floor(
+        (currentDate - strikeInfo.strikeStartDate) /
+        (1000 * 60 * 60 * 24)
+    );
+
+    if (calculateDay === strikeInfo.strikeCount) {
+
+        await StrikeCount.findByIdAndUpdate(
+            strikeInfo._id,
+            { $inc: { strikeCount: 1 } }
+        );
+        await User.findById(userdata._id,{apiCallDate:Date.now()},{new:true});
+
+    } else {
+
+        await StrikeCount.findByIdAndUpdate(
+            strikeInfo._id,
+            {
+                strikeCount: 1,
+                strikeStartDate: currentDate
+            }
+        );
+        await User.findById(userdata._id,{apiCallDate:Date.now()},{new:true});
+
+    }
+
+    const updatedStrike = await StrikeCount
+        .findOne({ userId: userdata._id })
+        .select("strikeCount -_id")
+        .lean();
+
+    return res.status(200).json(
+        new ApiResponse(
+            200,
+            updatedStrike.strikeCount,
+            "Strike has been updated."
+        )
+    );
+});
+
+
 export {
     getTotalInterviewsCount,
-    getAverageInterviewScore
+    getAverageInterviewScore,
+    userStrikeCount
 }

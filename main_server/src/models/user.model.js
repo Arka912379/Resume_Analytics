@@ -15,6 +15,17 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    gender:{
+        type:String,
+        enum:['Male','Female'],
+        required: true,
+        
+    },
+    dob:{
+        type:Date,
+        required:true
+
+    },
     imageUrl: {
         type: String,
         required: true,
@@ -25,35 +36,11 @@ const userSchema = new mongoose.Schema({
         required: true,
 
     },
-    apiCallStatus: {
-        type: Boolean,
-        default: false,
-        get: function () {
-            const now = new Date();
+    apiCallDate:{
+        type:Date,
+    }
 
-            // Create a reference for 12:00 PM today
-            const noonToday = new Date(now);
-            noonToday.setHours(12, 0, 0, 0);
-
-            // If the current time is past 12:00 PM, return false. Otherwise, true.
-            return now < noonToday;
-        }
-    },
-    
-
-}, { timestamps: true },{toJSON: { getters: true }, 
-  toObject: { getters: true } })
+}, { timestamps: true })
 
 const User = mongoose.model("User", userSchema);
 export default User;
-
-/*
-    image
-    name
-    email
-    gender
-    bio
-    mobile no
-    dob
-    password
-*/
