@@ -51,7 +51,7 @@ const verifyOtp = asyncHandler(async (req, res) => {
 
 const register = asyncHandler(async (req, res) => {
     console.log(req.body);
-    const { fullName, email, password, bio } = req.body;
+    const { fullName, email, password, bio, dob, gender } = req.body;
     if (!fullName || !bio || !password || !email) {
         throw new ApiError(400, 'All details are not found');
     }
@@ -77,6 +77,8 @@ const register = asyncHandler(async (req, res) => {
         fullName,
         email: email,
         userBio: bio ? bio : null,
+        dob: dob,
+        gender: gender,
         imageUrl: uploadResult?.url || 'https://ik.imagekit.io/ufopzzlbh/p.jpeg',
         password: haspass
     })
@@ -143,57 +145,16 @@ const forgetPassword = asyncHandler(async (req, res) => {
 
 })
 
-const userStrikeCount = asyncHandler(async (req, res) => {
-
-    const userdata = req.user;
-
-    const strikeInfo = await StrikeCount
-        .findOne({ userId: userdata._id })
-        .lean();
-
-    if (!strikeInfo) {
-        return res.status(404).json(
-            new ApiResponse(404, null, "Strike information not found.")
-        );
-    }
-
-    const currentDate = new Date();
-
-    const calculateDay = Math.floor(
-        (currentDate - strikeInfo.strikeStartDate) /
-        (1000 * 60 * 60 * 24)
-    );
-
-    if (calculateDay === strikeInfo.strikeCount) {
-
-        await StrikeCount.findByIdAndUpdate(
-            strikeInfo._id,
-            { $inc: { strikeCount: 1 } }
-        );
-
-    } else {
-
-        await StrikeCount.findByIdAndUpdate(
-            strikeInfo._id,
-            {
-                strikeCount: 1,
-                strikeStartDate: currentDate
-            }
-        );
-    }
-
-    const updatedStrike = await StrikeCount
-        .findOne({ userId: userdata._id })
+const getUserData = asyncHandler(async (req, res) => {
+    userData = req.user;
+    const { strikeCount: strikday } = await StrikeCount
+        .findById(userdata._id)
         .select("strikeCount -_id")
         .lean();
 
-    return res.status(200).json(
-        new ApiResponse(
-            200,
-            updatedStrike.strikeCount,
-            "Strike has been updated."
-        )
-    );
-});
+    return res.status(200).json(new ApiResponse(200, { userData, strikday },"User date is fecthed Successfully."))
 
-export { sendOtp, verifyOtp, register, login, findUserDataForForgetPassword, forgetPassword , userStrikeCount}
+})
+
+
+export { sendOtp, verifyOtp, register, login, findUserDataForForgetPassword, forgetPassword ,getUserData }

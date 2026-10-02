@@ -1,5 +1,6 @@
 import expres from "express"
-import { findUserDataForForgetPassword, forgetPassword, login, register, sendOtp, verifyOtp } from "../controllers/user.controller.js";
+import { findUserDataForForgetPassword, forgetPassword, getUserData, login, register, sendOtp, verifyOtp } from "../controllers/user.controller.js";
+import { verifyUser } from "../middlewares/user.middleware.js";
 
 const AuthRouter = expres.Router();
 
@@ -10,6 +11,7 @@ AuthRouter.post("/login",login);
 AuthRouter.post("/register",register);
 AuthRouter.post("/find-data-forget",findUserDataForForgetPassword);
 AuthRouter.post("/forget-passowrd",forgetPassword);
+AuthRouter.post("/getuser",verifyUser,getUserData);
 
 
 
