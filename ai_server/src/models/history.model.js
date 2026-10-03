@@ -20,9 +20,13 @@ const historySchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'JobDescriptionAnalysis',
     },
+    jobFinderId: {
+        type: Schema.Types.ObjectId,
+        ref: 'JobFinderResult',
+    },
     typeOfHistory: {
         type: String,
-        enum: ['resume', 'interview', 'jobDescriptionAnalysis'],
+        enum: ['resume', 'interview', 'jobDescriptionAnalysis', 'jobFinder'],
         required: true,
     },
 }, {timestamps:true});

@@ -5,29 +5,21 @@ import axios from 'axios';
 import mongoose from 'mongoose';
 import User from '../models/user.model.js';
 
-const AI_SERVER_URL = process.env.AI_SERVER_URL + '/api/v2/job-description-analysis';
+const AI_SERVER_URL = process.env.AI_SERVER_URL + '/api/v2/job-finder';
 
-const jobDescriptionAnalysis = asyncHandler(async (req, res) => {
-    const userId = req.user._id; 
-    const { jobDescription } = req.body;
+const findJobsForUser = asyncHandler(async (req, res) => {
+    const userId = req.user._id;
 
-    if(!mongoose.Types.ObjectId.isValid(userId)) {
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
         throw new ApiError(400, 'Invalid userId');
     }
 
-    if(!jobDescription) {
-        throw new ApiError(400, 'Job description is required');
-    }
-
     const user = await User.findById(userId);
-    if(!user) {
+    if (!user) {
         throw new ApiError(404, 'User not found');
     }
 
-    const response = await axios.post(`${AI_SERVER_URL}/jd/${userId}`, {
-        jobDescription
-    });
-    console.log("AI Server Response:", response);
+    const response = await axios.post(`${AI_SERVER_URL}/${userId}/find-jobs`);
 
     if(response.status !== 201) {
         throw new ApiError(response.status, 'Failed to analyze job description');
@@ -36,4 +28,4 @@ const jobDescriptionAnalysis = asyncHandler(async (req, res) => {
     return res.status(200).json(new ApiResponse(200, response.data.data, 'Job description analysis completed successfully'));
 })
 
-export { jobDescriptionAnalysis };
+export { findJobsForUser };

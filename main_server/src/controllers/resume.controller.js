@@ -174,7 +174,7 @@ const parsePDF = asyncHandler(async (req, res, next) => {
         .json(
             new ApiResponse(
                 200,
-                null,
+                { resume: newResume },
                 "PDF parsed successfully"
             )
         )

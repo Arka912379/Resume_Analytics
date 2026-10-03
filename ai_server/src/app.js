@@ -12,10 +12,12 @@ app.use(express.static("public"))
 
 import interviewRouter from "./routes/interview.route.js"
 import jobDescriptionAnalysisRouter from "./routes/jobDescriptionAnalysis.route.js"
+import jobFinderRouter from "./routes/jobfinder.route.js"
 import errorHandler from "./middlewares/error.middleware.js";
 
 app.use("/api/v2/interview", interviewRouter)
 app.use("/api/v2/job-description-analysis", jobDescriptionAnalysisRouter)
+app.use("/api/v2/job-finder", jobFinderRouter)
 app.use(errorHandler)
 
 app.get("/", (req, res) => {

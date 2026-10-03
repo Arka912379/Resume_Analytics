@@ -4,6 +4,7 @@ import { ApiError } from '../utils/apiError.js';
 import User from '../models/user.model.js';
 import mongoose from 'mongoose';
 import StrikeCount from '../models/strikeCount.model.js';
+import Resume from '../models/resume.model.js';
 
 const getTotalInterviewsCount = asyncHandler(async (req, res) => {
     const userId = req.user._id;
@@ -173,9 +174,35 @@ const userStrikeCount = asyncHandler(async (req, res) => {
     );
 });
 
+const getUserResumeATSScore = asyncHandler(async (req, res) => {
+    const userId = req.user._id;
+
+    if (!userId) {
+        throw new ApiError(401, 'Unauthorized');
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+        throw new ApiError(400, 'Invalid user ID');
+    }
+
+    const resume = await Resume.findOne({ userId: userId }).lean();
+    if (!resume) {
+        throw new ApiError(404, 'Resume not found');
+    }
+
+    return res.status(200).json(
+        new ApiResponse(
+            200,
+            { atsScore: resume.atsScore },
+            'User resume ATS score fetched successfully'
+        )
+    );
+})
+
 
 export {
     getTotalInterviewsCount,
     getAverageInterviewScore,
-    userStrikeCount
+    userStrikeCount,
+    getUserResumeATSScore
 }
