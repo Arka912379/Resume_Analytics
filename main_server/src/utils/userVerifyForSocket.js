@@ -1,13 +1,13 @@
 import jwt from "jsonwebtoken"
 import User from "../models/user.model.js";
 import { getAuth } from "firebase-admin/auth";
-import firebaseAdmin from "../configs/firebaseAdmin.js";
+import app from "../configs/firebaseAdmin.js";
 
 const verifyUser = async (token, authType) => {
     let email;
 
     if (authType == "firebase") {
-        const decoded = await getAuth(firebaseAdmin).verifyIdToken(token);
+        const decoded = await getAuth(app).verifyIdToken(token);
         console.log(decoded);
         email = decoded.email;
     } else if (authType == "normal") {
