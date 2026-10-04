@@ -40,7 +40,7 @@ export default function Sidebar({
       />
 
       <nav aria-label="Main navigation" className="mt-7 max-[1100px]:mt-6 max-[720px]:mt-8">
-        <ul className="flex flex-col gap-1.5">
+        <ul className="flex flex-col gap-3">
           {navigationItems.map(({ label, path, icon: Icon, end }) => (
             <li key={path}>
               <NavLink
