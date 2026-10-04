@@ -2,6 +2,7 @@ import { asyncHandler } from "../utils/asyncHandler.js"
 import { ApiResponse } from "../utils/apiResponse.js"
 import { ApiError } from "../utils/apiError.js";
 import User from "../models/user.model.js";
+import jwt from "jsonwebtoken"
 import sendemail from "../middlewares/sendotp.middleware.js";
 import { generateReferenceCode } from "../utils/referenceCodeGenFun.js";
 import OTP from "../models/otp.model.js";
@@ -146,13 +147,15 @@ const forgetPassword = asyncHandler(async (req, res) => {
 })
 
 const getUserData = asyncHandler(async (req, res) => {
-    userData = req.user;
-    const { strikeCount: strikday } = await StrikeCount
-        .findById(userdata._id)
-        .select("strikeCount -_id")
+    const userData = req.user;
+
+    const strikecountinfo = await StrikeCount
+        .findOne({userId:userData._id})
+        .select("strikeCount")
         .lean();
 
-    return res.status(200).json(new ApiResponse(200, { userData, strikday },"User date is fecthed Successfully."))
+    const strikeday=strikecountinfo.strikeCount
+    return res.status(200).json(new ApiResponse(200, { userData, strikeday },"User date is fecthed Successfully."))
 
 })
 

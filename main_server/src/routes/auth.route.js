@@ -11,7 +11,7 @@ AuthRouter.post("/login",login);
 AuthRouter.post("/register",register);
 AuthRouter.post("/find-data-forget",findUserDataForForgetPassword);
 AuthRouter.post("/forget-passowrd",forgetPassword);
-AuthRouter.post("/getuser",verifyUser,getUserData);
+AuthRouter.get("/getuser",verifyUser,getUserData);
 
 
 
