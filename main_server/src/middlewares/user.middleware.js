@@ -13,6 +13,7 @@ const verifyUser = asyncHandler(async (req, res, next) => {
         : null;
 
     const cookieToken = req.cookies?.authToken;
+    console.log(cookieToken)
     let email;
 
     // Firebase authentication gets priority
