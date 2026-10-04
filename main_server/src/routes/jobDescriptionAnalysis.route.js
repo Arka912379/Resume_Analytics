@@ -4,6 +4,6 @@ import { verifyUser } from "../middlewares/user.middleware.js";
 
 const router = Router();
 
-router.route("/jd/:userId").post(verifyUser, jobDescriptionAnalysis);
+router.route("/get-job-description-analysis").post(verifyUser, jobDescriptionAnalysis);
 
 export default router;

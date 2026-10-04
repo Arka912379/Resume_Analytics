@@ -10,6 +10,7 @@ import { uploadToImageKit } from "../utils/imageKit.js";
 import { options } from "../constants.js";
 import bcrypt from "bcrypt";
 import StrikeCount from "../models/strikeCount.model.js";
+import jwt from "jsonwebtoken";
 const sendOtp = asyncHandler(async (req, res) => {
     console.log(req.body)
     const { email } = req.body;
@@ -109,6 +110,7 @@ const login = asyncHandler(async (req, res) => {
         userId: userdata._id,
         email: userdata.email,
     }, process.env.JWT_SERECT)
+    console.log("Auth Token:", authToken);
     return res
         .status(200)
         .cookie("authToken", authToken, options)

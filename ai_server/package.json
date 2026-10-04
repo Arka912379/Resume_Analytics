@@ -14,6 +14,8 @@
   "dependencies": {
     "@langchain/core": "^1.2.9",
     "@langchain/google": "^0.2.4",
+    "@langchain/langgraph": "^1.4.18",
+    "@tavily/core": "^0.7.13",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",

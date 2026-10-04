@@ -37,7 +37,7 @@ const verifyUser = asyncHandler(async (req, res, next) => {
         try {
             const decoded = jwt.verify(
                 cookieToken,
-                process.env.JWT_SECRET
+                process.env.JWT_SERECT
             );
 
             email = decoded.email;

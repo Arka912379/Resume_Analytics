@@ -98,6 +98,19 @@ const getHistoryDataById = asyncHandler(async (req, res) => {
                 },
             },
         ];
+    } else if (type === 'jobFinder') {
+        pipeline = [
+            { $match: { _id: historyRecord._id } },
+            {
+                $lookup: {
+                    from: 'jobfinderresults',
+                    localField: 'jobFinderId',
+                    foreignField: '_id',
+                    as: 'jobFinder',
+                },
+            },
+            { $unwind: { path: '$jobFinder', preserveNullAndEmptyArrays: true } },
+        ];
     } else {
         throw new ApiError(400, 'Unknown typeOfHistory on this history record');
     }
