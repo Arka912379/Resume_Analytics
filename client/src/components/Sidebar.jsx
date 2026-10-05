@@ -13,7 +13,7 @@ import BrandLogo from './BrandLogo.jsx'
 const defaultNavigationItems = [
   { label: 'Dashboard', path: '/', icon: LayoutDashboard, end: true },
   { label: 'AI Interview', path: '/interview', icon: MessageSquare },
-  { label: 'Old Activities', path: '/activities', icon: Clock3 },
+  { label: 'Old Activities', path: '/history', icon: Clock3 },
   { label: 'Resume Analysis', path: '/resume-analysis', icon: FileText },
   { label: 'Job Finder', path: '/job-finder', icon: BriefcaseBusiness },
   { label: 'My Profile', path: '/profile', icon: UserRound },

@@ -7,6 +7,7 @@ import { AuthProvider } from './contexts/AuthContext.jsx'
 import LoginPage from './pages/LoginPage.jsx'
 import SignUpPage from './pages/SignUpPage.jsx'
 import Dashboard from './pages/Dashboard.jsx'
+import History from './pages/History.jsx'
 
 const router = createBrowserRouter([
   {
@@ -25,6 +26,10 @@ const router = createBrowserRouter([
       {
         path: "/",
         element: <Dashboard />,
+      },
+      {
+        path: "/history",
+        element: <History />,
       },
     ]
   }

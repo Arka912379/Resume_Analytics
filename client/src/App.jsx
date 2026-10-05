@@ -7,12 +7,14 @@ import Navbar from './components/Navbar.jsx'
 
 function App() {
   return (
-    <div className="h-screen w-full flex justify-center items-center">
-      <Sidebar />
+    <div className="flex h-screen w-full items-start overflow-hidden">
+      <Sidebar className="sticky top-0 self-start" />
       <Navbar />
-      <Suspense fallback={<div>Loading...</div>}>
-        <Outlet />
-      </Suspense>
+      <main className="h-screen min-w-0 flex-1 overflow-y-auto">
+        <Suspense fallback={<div>Loading...</div>}>
+          <Outlet />
+        </Suspense>
+      </main>
     </div>
   )
 }
