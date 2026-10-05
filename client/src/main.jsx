@@ -7,6 +7,8 @@ import { AuthProvider } from './contexts/AuthContext.jsx'
 import LoginPage from './pages/LoginPage.jsx'
 import SignUpPage from './pages/SignUpPage.jsx'
 import Dashboard from './pages/Dashboard.jsx'
+import ForgotPassword from './pages/Forgotpassword.jsx'
+import ResumeUpload from './pages/ResumeUpload.jsx'
 
 const router = createBrowserRouter([
   {
@@ -16,6 +18,14 @@ const router = createBrowserRouter([
   {
     path: "/signup",
     element: <SignUpPage />,
+  },
+  {
+    path: "/forgotPassword",
+    element: <ForgotPassword />,
+  },
+  {
+    path: "/ResumeUpload",
+    element: <ResumeUpload />,
   },
   {
     path: "/",
