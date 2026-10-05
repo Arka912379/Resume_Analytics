@@ -1,4 +1,5 @@
 import { Bell, ChevronDown, UserRound } from 'lucide-react'
+import { useLocation } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext.jsx'
 
 const nameSizeClasses = {
@@ -7,28 +8,57 @@ const nameSizeClasses = {
   large: 'text-[clamp(2rem,3.6vw,3.4rem)]',
 }
 
-const Navbar = ({
-  greeting = 'WELCOME BACK,',
-  subtitle = 'Track your progress and get interview ready.',
-  nameSize = 'large',
-}) => {
+const pageHeadings = {
+  '/history': {
+    title: 'Old Activities',
+    subtitle: 'View your past interviews, resume analysis, and score updates.',
+  },
+  '/interview': {
+    title: 'AI Interview',
+    subtitle: 'Practice your interview skills and improve your confidence.',
+  },
+  '/resume-analysis': {
+    title: 'Resume Analysis',
+    subtitle: 'Review your resume and find ways to improve it.',
+  },
+  '/job-finder': {
+    title: 'Job Finder',
+    subtitle: 'Find roles that match your skills and experience.',
+  },
+  '/profile': {
+    title: 'My Profile',
+    subtitle: 'Manage your profile and account details.',
+  },
+}
+
+const Navbar = () => {
+  const { pathname } = useLocation()
   const { user } = useAuth()
+  const pageHeading = pageHeadings[pathname]
   const displayName = (user?.displayName || 'NILAYESH').toUpperCase()
   const profileName = user?.displayName || 'Nilayesh Adhikari'
-  const selectedNameSize = nameSizeClasses[nameSize] || nameSizeClasses.large
+  const selectedNameSize = nameSizeClasses.large
 
   return (
-    <div className='fixed top-0 w-[80%] h-28 text-black right-0 flex justify-between items-start'>
+    <div className='fixed top-0 right-0 z-20 h-28 w-[80%] text-black flex justify-between items-start'>
       <div className="heading flex mt-8 h-full min-w-0 flex-1 items-center pl-2 max-[720px]:pl-3">
         <div className="flex min-w-0 flex-col items-start gap-1">
-          <p className="text-[clamp(1.15rem,2vw,1.7rem)] font-black uppercase leading-none tracking-tight">
-            {greeting}
-          </p>
-          <p className={`w-fit mb-2 border-[3px] border-[#111] bg-[#b290ff] px-3 py-1 ${selectedNameSize} font-black leading-none tracking-tight text-[#111] shadow-[5px_5px_0_#111] max-w-full whitespace-nowrap`}>
-            {displayName}!
-          </p>
+            {pageHeading ? (
+              <p className={`mb-2 w-fit max-w-full border-[3px] border-[#111] bg-[#b290ff] px-3 py-1 ${selectedNameSize} font-black uppercase leading-none tracking-tight text-[#111] shadow-[5px_5px_0_#111]`}>
+                {pageHeading.title}
+              </p>
+            ) : (
+              <>
+                <p className="text-[clamp(1.15rem,2vw,1.7rem)] font-black uppercase leading-none tracking-tight">
+                  Welcome Back,
+                </p>
+                <p className={`mb-2 w-fit max-w-full border-[3px] border-[#111] bg-[#b290ff] px-3 py-1 ${selectedNameSize} font-black leading-none tracking-tight text-[#111] shadow-[5px_5px_0_#111] whitespace-nowrap`}>
+                  {displayName}!
+                </p>
+              </>
+            )}
           <p className="text-[clamp(0.8rem,1vw,1rem)] font-medium leading-snug">
-            {subtitle}
+            {pageHeading?.subtitle || 'Track your progress and get interview ready.'}
           </p>
         </div>
       </div>
