@@ -1,9 +1,14 @@
-import { BrowserRouter, Navigate, Outlet, Route, Routes } from 'react-router-dom'
-import LoginPage from './pages/LoginPage.jsx'
-import SignUpPage from './pages/SignUpPage.jsx'
-import { Suspense } from 'react'
-import Sidebar from './components/Sidebar.jsx'
-import Navbar from './components/Navbar.jsx'
+import {
+  BrowserRouter,
+  Navigate,
+  Outlet,
+  Route,
+  Routes,
+} from "react-router-dom";
+import SignUpPage from "./pages/SignUpPage.jsx";
+import { Suspense } from "react";
+import Sidebar from "./components/Sidebar.jsx";
+import Navbar from "./components/Navbar.jsx";
 
 function App() {
   return (
@@ -16,7 +21,7 @@ function App() {
         </Suspense>
       </main>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
