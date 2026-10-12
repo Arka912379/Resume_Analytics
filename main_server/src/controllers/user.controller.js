@@ -10,7 +10,7 @@ import { uploadToImageKit } from "../utils/imageKit.js";
 import { options } from "../constants.js";
 import bcrypt from "bcrypt";
 import StrikeCount from "../models/strikeCount.model.js";
-import jwt from "jsonwebtoken";
+
 const sendOtp = asyncHandler(async (req, res) => {
     console.log(req.body)
     const { email } = req.body;

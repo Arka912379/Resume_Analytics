@@ -200,7 +200,7 @@ export default function History() {
   );
 
   return (
-    <div className="min-h-screen w-full bg-transparent px-3 py-8 pt-32 sm:px-4 lg:px-6">
+    <div className="min-h-screen w-full bg-transparent px-3 py-8 pt-[7rem] sm:px-4 lg:px-6">
       <div className="mx-auto w-full max-w-[1180px] font-sans">
         <div className="space-y-3" style={{ marginTop: '2rem' }}>
           {sortedActivities.length === 0 ? (

@@ -17,9 +17,9 @@ const pageHeadings = {
     title: 'AI Interview',
     subtitle: 'Practice your interview skills and improve your confidence.',
   },
-  '/resume-analysis': {
-    title: 'Resume Analysis',
-    subtitle: 'Review your resume and find ways to improve it.',
+  '/jdAnalysis': {
+    title: 'Job Description Analysis',
+    subtitle: 'Analyze job descriptions and tailor your applications.',
   },
   '/job-finder': {
     title: 'Job Finder',
@@ -35,16 +35,17 @@ const Navbar = () => {
   const { pathname } = useLocation()
   const { user } = useAuth()
   const pageHeading = pageHeadings[pathname]
+  const isJDAnalysis = pathname === '/jdAnalysis'
   const displayName = (user?.displayName || 'NILAYESH').toUpperCase()
   const profileName = user?.displayName || 'Nilayesh Adhikari'
   const selectedNameSize = nameSizeClasses.large
 
   return (
     <div className='fixed top-0 right-0 z-20 h-28 w-[80%] text-black flex justify-between items-start'>
-      <div className="heading flex mt-8 h-full min-w-0 flex-1 items-center pl-2 max-[720px]:pl-3">
-        <div className="flex min-w-0 flex-col items-start gap-1">
+      <div className={`heading flex mt-6 h-full min-w-0 flex-1 items-start ${pathname === '/' && 'pl-2'} max-[720px]:pl-3`}>
+        <div className={`flex min-w-0 flex-col items-start gap-1 ${isJDAnalysis ? 'w-full' : ''}`}>
             {pageHeading ? (
-              <p className={`mb-2 w-fit max-w-full border-[3px] border-[#111] bg-[#b290ff] px-3 py-1 ${selectedNameSize} font-black uppercase leading-none tracking-tight text-[#111] shadow-[5px_5px_0_#111]`}>
+              <p className={`mb-2 w-fit max-w-full border-[3px] border-[#111] bg-[#b290ff] px-3 py-1 ${selectedNameSize} tracking-tight shadow-[5px_5px_0_#111] font-black uppercase leading-none text-[#111]`}>
                 {pageHeading.title}
               </p>
             ) : (
