@@ -5,7 +5,7 @@ const useHistoryStore = create((set) => ({
     history: [],
     message: null,
     isLoading : false,
-    error : null
+    error : null,
 }));
 
 export default useHistoryStore;
