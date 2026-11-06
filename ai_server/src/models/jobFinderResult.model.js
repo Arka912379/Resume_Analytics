@@ -42,6 +42,11 @@ const jobFinderResultSchema = new Schema(
                 company: { type: String, default: null },
                 url: { type: String, required: true },
                 matchReason: { type: String, default: null },
+
+                matchPercentage: { type: Number, min: 0, max: 100, default: null },
+                description: { type: String, default: null },
+                postedAgo: { type: String, default: null },
+                location: { type: String, default: null },
             },
         ],
     },

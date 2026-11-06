@@ -55,35 +55,48 @@ export const buildSearchQueriesPrompt = ({ profile }) => {
 
 
 export const buildJobRankingPrompt = ({ profile, rawResults }) => {
-    const systemPrompt = `You are an expert technical recruiter. You will receive a candidate's profile and a list of raw web search results (titles, URLs, and short content snippets) gathered from several job-search queries.
- 
-        Your job: select the best 10 results that are genuinely relevant, real, open job postings matching the candidate's profile.
-        
+    const today = new Date().toDateString();
+
+    const systemPrompt = `You are an expert technical recruiter. You will receive a candidate's profile and a list of raw web search results (title, URL, and the page text) gathered from several job-search queries. Today's date is ${today}.
+
+        Select the best 10 results that are genuinely relevant, real, open job postings matching the candidate's profile.
+
         Rules:
-        - Only pick results that look like actual job postings (not blog posts, "top 10 companies" articles, generic career advice pages, or job-board homepages with no specific role).
+        - Only pick results that look like actual job postings (not blog posts, "top 10 companies" articles, career advice pages, or job-board homepages with no specific role).
         - Prefer postings that clearly match the candidate's developer type(s) and experience level.
-        - Remove duplicates (same job posted on multiple sites, or the same URL appearing twice).
-        - If fewer than 10 genuinely good postings exist in the results, return fewer rather than padding with irrelevant ones.
-        - For each selected job, write a one-sentence "matchReason" explaining specifically why it fits this candidate.
-        - Use the "url" EXACTLY as given in the raw results — never invent or modify a URL.
-        - Extract "title" and "company" from the result's title/content if identifiable; use null for "company" if it cannot be determined.
-        
+        - Remove duplicates (same job on multiple sites, or the same URL twice).
+        - If fewer than 10 genuinely good postings exist, return fewer rather than padding.
+        - Use the "url" EXACTLY as given in the raw results. Never invent or modify a URL.
+        - "title" and "company": extract from the result; use null for "company" if unknown.
+        - "matchReason": one sentence explaining specifically why it fits this candidate.
+        - "matchPercentage": an integer 0-100 for how well the job fits the candidate (skills, developer type, seniority). Be honest and vary scores; do not give everything 90+.
+        - "location": the job location as written in the posting (e.g. "Bengaluru, India", "Remote", "Hybrid - Pune"). Use null if not stated.
+        - "postedAgo": when the job was posted, as a short human phrase relative to today: "Today", "Yesterday", "Tuesday", "3 days ago", "2 weeks ago". Use only what the page text states or clearly implies. Use null if not found. Never guess.
+
         Output ONLY valid JSON matching the schema below. No markdown fences, no commentary.
-        
+
         JSON schema:
         {
             "jobs": [
-                { "title": "string", "company": "string | null", "url": "string", "matchReason": "string" }
+                {
+                    "title": "string",
+                    "company": "string | null",
+                    "url": "string",
+                    "matchReason": "string",
+                    "matchPercentage": number,
+                    "location": "string | null",
+                    "postedAgo": "string | null"
+                }
             ]
         }
     `;
- 
+
     const userPrompt = `Candidate profile (JSON):
         ${JSON.stringify(profile, null, 2)}
-        
+
         Raw search results (JSON):
         ${JSON.stringify(rawResults, null, 2)}
     `;
- 
+
     return { systemPrompt, userPrompt };
 };
