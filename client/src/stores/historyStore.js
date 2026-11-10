@@ -6,6 +6,7 @@ const useHistoryStore = create((set) => ({
     message: null,
     isLoading : false,
     error : null,
+    getAllHistorys : async () => {}
 }));
 
 export default useHistoryStore;
