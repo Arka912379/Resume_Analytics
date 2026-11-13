@@ -12,7 +12,6 @@ import ResumeUpload from './pages/ResumeUpload.jsx'
 import History from './pages/History.jsx'
 import JDAnalysis from './pages/JDAnalysis.jsx'
 import ProfilePage from './pages/Profilepage.jsx'
-
 const router = createBrowserRouter([
   {
     path: "/login",
