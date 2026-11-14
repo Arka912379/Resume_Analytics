@@ -12,6 +12,8 @@ import ResumeUpload from './pages/ResumeUpload.jsx'
 import History from './pages/History.jsx'
 import JDAnalysis from './pages/JDAnalysis.jsx'
 import ProfilePage from './pages/Profilepage.jsx'
+import JobFinder from './pages/JobFinder.jsx'
+
 const router = createBrowserRouter([
   {
     path: "/login",
@@ -37,6 +39,10 @@ const router = createBrowserRouter([
       {
         path: "/",
         element: <Dashboard />,
+      },
+      {
+        path: "/jobFinder",
+        element: <JobFinder />,
       },
       {
         path: "/history",
