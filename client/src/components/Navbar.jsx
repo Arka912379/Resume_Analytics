@@ -1,4 +1,4 @@
-import { Bell, ChevronDown, UserRound } from 'lucide-react'
+import { Bell, ChevronDown, Clock3, Code2, UserRound } from 'lucide-react'
 import { useLocation } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext.jsx'
 
@@ -64,7 +64,19 @@ const getPageHeading = (pathname) => {
   return pageHeadings.find(({ paths }) => paths.some((path) => current.endsWith(path)))
 }
 
-const Navbar = () => {
+const Navbar = ({
+  variant = 'default',
+  eyebrow,
+  title,
+  subtitle,
+  rightContent,
+  status = 'ready',
+  elapsedSeconds = 0,
+  interviewTitle = 'Software Developer Interview',
+  showStatus = true,
+  showDuration = true,
+  className = '',
+}) => {
   const { pathname } = useLocation()
   const { user } = useAuth()
   const pageHeading = getPageHeading(pathname)
@@ -72,6 +84,59 @@ const Navbar = () => {
   const profileName = user?.displayName || 'Nilayesh Adhikari'
   const selectedNameSize = nameSizeClasses.large
   const subtitle = pageHeading ? pageHeading.subtitle : defaultSubtitle
+
+  if (variant === 'interview') {
+    const hours = Math.floor(elapsedSeconds / 3600)
+    const minutes = Math.floor((elapsedSeconds % 3600) / 60)
+    const seconds = elapsedSeconds % 60
+    const duration = hours > 0
+      ? `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
+      : `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
+    const statusLabel = status === 'live' ? 'Live' : status === 'ended' ? 'Ended' : 'Not Started'
+
+    return (
+      <div className={`flex w-full min-w-0 flex-wrap items-center justify-between gap-3 border-b-2 border-black/20 pb-3 text-[#111] ${className}`}>
+        <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2 sm:gap-3">
+          <div className="flex min-w-0 items-center gap-2">
+            <span className="grid h-9 w-9 shrink-0 place-items-center border-2 border-black bg-[#b290ff] shadow-[2px_2px_0_#111]"><Code2 aria-hidden="true" className="h-5 w-5" /></span>
+            <h1 className="text-base font-black leading-tight sm:text-lg">{interviewTitle}</h1>
+          </div>
+        </div>
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+          {showStatus && <span className={`inline-flex items-center gap-2 border-2 border-black px-2.5 py-1.5 text-xs font-black shadow-[2px_2px_0_#111] ${status === 'live' ? 'bg-[#d7f8e5]' : 'bg-[#efefef]'}`}>
+            <span aria-hidden="true" className={`h-2.5 w-2.5 rounded-full border border-black ${status === 'live' ? 'bg-[#5fdc98]' : 'bg-[#a6a6a6]'}`} />{statusLabel}
+          </span>}
+          {showDuration && <div className="flex items-center gap-2 border-2 border-black bg-white px-2.5 py-1 shadow-[2px_2px_0_#111]">
+            <Clock3 aria-hidden="true" className="h-4 w-4" />
+            <span><strong className="block font-mono text-sm leading-none">{duration}</strong><span className="block text-[0.62rem] font-bold leading-tight">Interview Duration</span></span>
+          </div>}
+          <div className="flex items-center gap-2">
+            <div className="grid h-9 w-9 shrink-0 place-items-center overflow-hidden border-2 border-black bg-[#b290ff]">
+              {user?.photoURL ? <img src={user.photoURL} alt={`${user.displayName || 'User'} avatar`} className="h-full w-full object-cover" /> : <UserRound aria-hidden="true" className="h-5 w-5" />}
+            </div>
+            <span className="max-w-40 truncate text-xs font-bold sm:text-sm">{user?.displayName || 'Candidate'}</span>
+            <ChevronDown aria-hidden="true" className="h-4 w-4 shrink-0" />
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (variant === 'page') {
+    const pageTitle = title || pageHeading?.title || 'Page'
+    const pageSubtitle = subtitle || pageHeading?.subtitle
+
+    return (
+      <header className={`relative z-20 flex w-full min-w-0 flex-col gap-3 border-b-2 border-black/20 pb-3 text-[#111] sm:flex-row sm:items-center sm:justify-between ${className}`}>
+        <div className="min-w-0 flex-1">
+          {eyebrow && <p className="mb-1 text-[0.65rem] font-black uppercase tracking-[0.16em] text-[#111]">{eyebrow}</p>}
+          <h1 className="text-[clamp(1.55rem,2.35vw,2.1rem)] font-black leading-tight tracking-tight">{pageTitle}</h1>
+          {pageSubtitle && <p className="mt-1 max-w-3xl text-sm font-medium leading-snug">{pageSubtitle}</p>}
+        </div>
+        {rightContent && <div className="w-full shrink-0 sm:w-56 lg:w-60">{rightContent}</div>}
+      </header>
+    )
+  }
 
   return (
     <div className='fixed top-0 right-0 z-20 h-28 w-[80%] text-black flex justify-between items-start'>

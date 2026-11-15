@@ -12,6 +12,7 @@ import ResumeUpload from './pages/ResumeUpload.jsx'
 import History from './pages/History.jsx'
 import JDAnalysis from './pages/JDAnalysis.jsx'
 import ProfilePage from './pages/Profilepage.jsx'
+import InterviewPage from './pages/InterviewPage.jsx'
 import JobFinder from './pages/JobFinder.jsx'
 import JobDescription from './pages/JobDescription.jsx'
 
@@ -60,6 +61,10 @@ const router = createBrowserRouter([
       {
         path: "/profile",
         element: <ProfilePage />,
+      },
+      {
+        path: "/interview",
+        element: <InterviewPage />,
       }
     ]
   }
