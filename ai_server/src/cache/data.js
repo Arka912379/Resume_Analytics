@@ -8,4 +8,4 @@ export function set(key, value) {
   map.set(key, value);
 }
 
-export { get, set };
+export { get, set }

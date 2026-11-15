@@ -6,6 +6,11 @@ const useHistoryStore = create((set) => ({
     message: null,
     isLoading : false,
     error : null,
+    getAllHistorys : async () => {
+        set({isLoading: true, message: null, error: null});
+    },
+    history: null,
+    getHistory: async (historyId) => {}
 }));
 
 export default useHistoryStore;

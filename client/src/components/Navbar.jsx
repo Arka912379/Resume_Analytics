@@ -8,27 +8,50 @@ const nameSizeClasses = {
   large: 'text-[clamp(2rem,3.6vw,3.4rem)]',
 }
 
-const pageHeadings = {
-  '/history': {
+const defaultSubtitle = 'Track your progress and get interview ready.'
+
+// The heading is chosen from the page address (URL path), ignoring case, dashes,
+// underscores and a trailing slash, so '/job-finder', '/jobFinder', '/job_finder/'
+// and '/jobs' all show "Job Finder". To support another address, add it to `paths`
+// in lowercase letters and numbers only (example: '/my-page' -> 'mypage').
+// greeting: true -> shows "WELCOME BACK," above the page title (like the dashboard)
+// subtitle: ''   -> no line under the title
+const pageHeadings = [
+  {
+    paths: ['history', 'oldactivities'],
     title: 'Old Activities',
     subtitle: 'View your past interviews, resume analysis, and score updates.',
   },
-  '/interview': {
+  {
+    paths: ['interview'],
     title: 'AI Interview',
     subtitle: 'Practice your interview skills and improve your confidence.',
   },
-  '/jdAnalysis': {
-    title: 'Job Description Analysis',
-    subtitle: 'Analyze job descriptions and tailor your applications.',
+  {
+    paths: ['resumeanalysis'],
+    title: 'Resume Analysis',
+    subtitle: 'Review your resume and find ways to improve it.',
   },
-  '/job-finder': {
+  {
+    paths: ['jobfinder', 'jobs'],
     title: 'Job Finder',
-    subtitle: 'Find roles that match your skills and experience.',
+    subtitle: '',
+    greeting: true,
   },
-  '/profile': {
+  {
+    paths: ['profile', 'myprofile'],
     title: 'My Profile',
     subtitle: 'Manage your profile and account details.',
   },
+]
+
+const compactPath = (value) => value.toLowerCase().replace(/[^a-z0-9]/g, '')
+
+// '/' (dashboard) returns undefined -> "Welcome Back, NAME!"
+const getPageHeading = (pathname) => {
+  const current = compactPath(pathname)
+  if (!current) return undefined
+  return pageHeadings.find(({ paths }) => paths.some((path) => current.endsWith(path)))
 }
 
 const Navbar = ({
@@ -46,11 +69,11 @@ const Navbar = ({
 }) => {
   const { pathname } = useLocation()
   const { user } = useAuth()
-  const pageHeading = pageHeadings[pathname]
-  const isJDAnalysis = pathname === '/jdAnalysis'
+  const pageHeading = getPageHeading(pathname)
   const displayName = (user?.displayName || 'NILAYESH').toUpperCase()
   const profileName = user?.displayName || 'Nilayesh Adhikari'
   const selectedNameSize = nameSizeClasses.large
+  const subtitle = pageHeading ? pageHeading.subtitle : defaultSubtitle
 
   if (variant === 'interview') {
     const hours = Math.floor(elapsedSeconds / 3600)
@@ -107,12 +130,19 @@ const Navbar = ({
 
   return (
     <div className='fixed top-0 right-0 z-20 h-28 w-[80%] text-black flex justify-between items-start'>
-      <div className={`heading flex mt-6 h-full min-w-0 flex-1 items-start ${pathname === '/' && 'pl-2'} max-[720px]:pl-3`}>
-        <div className={`flex min-w-0 flex-col items-start gap-1 ${isJDAnalysis ? 'w-full' : ''}`}>
+      <div className="heading flex mt-8 h-full min-w-0 flex-1 items-center pl-2 max-[720px]:pl-3">
+        <div className="flex min-w-0 flex-col items-start gap-1">
             {pageHeading ? (
-              <p className={`mb-2 w-fit max-w-full border-[3px] border-[#111] bg-[#b290ff] px-3 py-1 ${selectedNameSize} tracking-tight shadow-[5px_5px_0_#111] font-black uppercase leading-none text-[#111]`}>
-                {pageHeading.title}
-              </p>
+              <>
+                {pageHeading.greeting && (
+                  <p className="text-[clamp(1.15rem,2vw,1.7rem)] font-black uppercase leading-none tracking-tight">
+                    Welcome Back,
+                  </p>
+                )}
+                <p className={`mb-2 w-fit max-w-full border-[3px] border-[#111] bg-[#b290ff] px-3 py-1 ${selectedNameSize} font-black uppercase leading-none tracking-tight text-[#111] shadow-[5px_5px_0_#111]`}>
+                  {pageHeading.title}
+                </p>
+              </>
             ) : (
               <>
                 <p className="text-[clamp(1.15rem,2vw,1.7rem)] font-black uppercase leading-none tracking-tight">
@@ -123,9 +153,11 @@ const Navbar = ({
                 </p>
               </>
             )}
-          <p className="text-[clamp(0.8rem,1vw,1rem)] font-medium leading-snug">
-            {pageHeading?.subtitle || 'Track your progress and get interview ready.'}
-          </p>
+          {subtitle && (
+            <p className="text-[clamp(0.8rem,1vw,1rem)] font-medium leading-snug">
+              {subtitle}
+            </p>
+          )}
         </div>
       </div>
       <div className="profile ml-auto flex h-[80%] w-fit shrink-0 items-center justify-end gap-4 whitespace-nowrap pr-6 pt-2 max-[1100px]:gap-3 max-[1100px]:pr-4 max-[720px]:gap-1 max-[720px]:pr-2">
