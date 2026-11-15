@@ -13,6 +13,7 @@ import History from './pages/History.jsx'
 import JDAnalysis from './pages/JDAnalysis.jsx'
 import ProfilePage from './pages/Profilepage.jsx'
 import JobFinder from './pages/JobFinder.jsx'
+import JobDescription from './pages/JobDescription.jsx'
 
 const router = createBrowserRouter([
   {
@@ -51,6 +52,10 @@ const router = createBrowserRouter([
       {
         path: "/jdAnalysis",
         element: <JDAnalysis />,
+      },
+      {
+        path: "/jobDescription",
+        element: <JobDescription />,
       },
       {
         path: "/profile",
