@@ -33,6 +33,16 @@ const pageHeadings = [
     subtitle: 'Review your resume and find ways to improve it.',
   },
   {
+    paths: ['jobdescriptionanalysis', 'jdanalysis', 'analysisresult', 'jobdescriptionresult'],
+    title: 'Job Description Analysis',
+    subtitle: 'Get detailed insights on your resume and make it stronger.',
+  },
+  {
+    paths: ['jobdescription', 'jd'],
+    title: 'Job Description',
+    subtitle: 'Get detailed insights on your resume and make it stronger.',
+  },
+  {
     paths: ['jobfinder', 'jobs'],
     title: 'Job Finder',
     subtitle: '',
