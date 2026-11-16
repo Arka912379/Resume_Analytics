@@ -83,7 +83,7 @@ const Navbar = ({
   const displayName = (user?.displayName || 'NILAYESH').toUpperCase()
   const profileName = user?.displayName || 'Nilayesh Adhikari'
   const selectedNameSize = nameSizeClasses.large
-  const subtitle = pageHeading ? pageHeading.subtitle : defaultSubtitle
+  subtitle = pageHeading ? pageHeading.subtitle : defaultSubtitle
 
   if (variant === 'interview') {
     const hours = Math.floor(elapsedSeconds / 3600)
