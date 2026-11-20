@@ -11,7 +11,7 @@ const useHistoryStore = create((set) => ({
     },
     history: null,
     getHistory: async (historyId) => {
-        set({ isLoading: true, message: null, error: null });
+        set({ isLoading: true, message: null, error: null })
     }
 }));
 
