@@ -11,7 +11,7 @@ const defaultActions = [
   {
     title: 'Upload Resume',
     description: 'Analyze your resume',
-    to: '/resume-analysis',
+    to: '/ResumeUpload',
     icon: FileUp,
   },
   {
