@@ -10,7 +10,7 @@ connectDB().then(() => {
         console.log(err)
     })
     app.listen(PORT,()=>{
-        console.log("server running",PORT)
+        console.log("server running",PORT);
     })
 }).catch((err) => {
     console.log("connection failed", err?.message)
