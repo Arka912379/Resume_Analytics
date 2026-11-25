@@ -50,7 +50,7 @@ export default function Sidebar({
                 className={({ isActive }) =>
                   `group flex min-h-11 w-full items-center gap-2.5 border-2 px-3 py-2 text-left text-base font-extrabold transition-[transform,box-shadow,background-color] duration-100 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-black/40 max-[1100px]:gap-2 max-[1100px]:px-2 max-[1100px]:text-sm max-[720px]:justify-center max-[720px]:px-1 ${
                     isActive
-                      ? 'border-black bg-[#111] !text-white shadow-[3px_3px_0_#111]'
+                      ? 'border-black bg-[#b290ff] !text-black shadow-[3px_3px_0_#111]'
                       : 'border-transparent text-[#111] hover:translate-x-0.5 hover:-translate-y-0.5 hover:border-black hover:bg-[#5fdc98] hover:shadow-[3px_3px_0_#111] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none'
                   }`
                 }

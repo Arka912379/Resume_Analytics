@@ -1,6 +1,30 @@
+import { useEffect, useSyncExternalStore } from 'react'
 import { Bell, ChevronDown, Clock3, Code2, UserRound } from 'lucide-react'
 import { useLocation } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext.jsx'
+
+// A page that draws its own heading bar (<Navbar inline ... />) calls
+// useHideLayoutNavbar(): while that page is mounted, the layout's pinned navbar
+// draws nothing, whatever the page address is. (Works even when the page shares
+// an address such as /interview with another screen.)
+let hideCount = 0
+const hideListeners = new Set()
+const subscribeHide = (listener) => {
+  hideListeners.add(listener)
+  return () => hideListeners.delete(listener)
+}
+const isLayoutNavbarHidden = () => hideCount > 0
+
+export function useHideLayoutNavbar() {
+  useEffect(() => {
+    hideCount += 1
+    hideListeners.forEach((listener) => listener())
+    return () => {
+      hideCount -= 1
+      hideListeners.forEach((listener) => listener())
+    }
+  }, [])
+}
 
 const nameSizeClasses = {
   small: 'text-[clamp(1.4rem,2.2vw,1.8rem)]',
@@ -14,13 +38,24 @@ const defaultSubtitle = 'Track your progress and get interview ready.'
 // underscores and a trailing slash, so '/job-finder', '/jobFinder', '/job_finder/'
 // and '/jobs' all show "Job Finder". To support another address, add it to `paths`
 // in lowercase letters and numbers only (example: '/my-page' -> 'mypage').
-// greeting: true -> shows "WELCOME BACK," above the page title (like the dashboard)
-// subtitle: ''   -> no line under the title
+// greeting: true        -> shows "WELCOME BACK," above the page title (like the dashboard)
+// subtitle: ''          -> no line under the title
+// drawnByPage: true     -> the layout's navbar draws nothing on this page. The page
+//                          draws the bar itself with <Navbar inline />, as part of
+//                          its own content (so it scrolls with it, or stays inside a
+//                          fixed one-screen page)
 const pageHeadings = [
   {
     paths: ['history', 'oldactivities'],
     title: 'Old Activities',
     subtitle: 'View your past interviews, resume analysis, and score updates.',
+  },
+  {
+    paths: ['interviewresults', 'interviewresult'],
+    title: 'Interview Results',
+    subtitle: 'Here is your detailed performance analysis and personalized feedback.',
+    sparkle: true, // little rays next to the title box
+    drawnByPage: true, // InterviewResults.jsx draws the bar itself with <Navbar inline />
   },
   {
     paths: ['interview'],
@@ -76,14 +111,27 @@ const Navbar = ({
   showStatus = true,
   showDuration = true,
   className = '',
+  inline = false, // true -> a normal block inside the page (scrolls with it) instead of pinned
+  sparkle = false, // little rays next to the title box (used with a custom `title`)
+  greeting = false, // "WELCOME BACK," line above a custom `title`
 }) => {
   const { pathname } = useLocation()
   const { user } = useAuth()
+  const layoutNavbarHidden = useSyncExternalStore(subscribeHide, isLayoutNavbarHidden)
   const pageHeading = getPageHeading(pathname)
   const displayName = (user?.displayName || 'NILAYESH').toUpperCase()
   const profileName = user?.displayName || 'Nilayesh Adhikari'
   const selectedNameSize = nameSizeClasses.large
+  const subtitleProp = subtitle
   subtitle = pageHeading ? pageHeading.subtitle : defaultSubtitle
+
+  // a page can name its own heading with the `title` prop (default bar only), for
+  // screens that share an address with another page, e.g. results shown at /interview
+  const heading =
+    variant === 'default' && title
+      ? { title, subtitle: subtitleProp ?? '', sparkle, greeting }
+      : pageHeading
+  const headingSubtitle = heading === pageHeading ? subtitle : heading.subtitle
 
   if (variant === 'interview') {
     const hours = Math.floor(elapsedSeconds / 3600)
@@ -138,19 +186,42 @@ const Navbar = ({
     )
   }
 
+  // pages marked drawnByPage draw their own bar inside the page content
+  // (<Navbar inline />), so the layout's copy draws nothing for them
+  if ((pageHeading?.drawnByPage || layoutNavbarHidden) && !inline) return null
+
+  // pinned to the top-right of the screen, or (inline) a normal block that
+  // scrolls together with the page
+  const frameClass = inline ? 'relative h-28 w-full' : 'fixed top-0 right-0 h-28 w-[80%]'
+
   return (
-    <div className='fixed top-0 right-0 z-20 h-28 w-[80%] text-black flex justify-between items-start'>
+    <div className={`${frameClass} z-20 text-black flex justify-between items-start`}>
       <div className="heading flex mt-8 h-full min-w-0 flex-1 items-center pl-2 max-[720px]:pl-3">
         <div className="flex min-w-0 flex-col items-start gap-1">
-            {pageHeading ? (
+            {heading ? (
               <>
-                {pageHeading.greeting && (
+                {heading.greeting && (
                   <p className="text-[clamp(1.15rem,2vw,1.7rem)] font-black uppercase leading-none tracking-tight">
                     Welcome Back,
                   </p>
                 )}
-                <p className={`mb-2 w-fit max-w-full border-[3px] border-[#111] bg-[#b290ff] px-3 py-1 ${selectedNameSize} font-black uppercase leading-none tracking-tight text-[#111] shadow-[5px_5px_0_#111]`}>
-                  {pageHeading.title}
+                <p className={`relative mb-2 w-fit max-w-full border-[3px] border-[#111] bg-[#b290ff] px-3 py-1 ${selectedNameSize} font-black uppercase leading-none tracking-tight text-[#111] shadow-[5px_5px_0_#111]`}>
+                  {heading.title}
+                  {heading.sparkle && (
+                    <svg
+                      aria-hidden="true"
+                      viewBox="0 0 56 60"
+                      className="pointer-events-none absolute left-full top-[-1.25rem] ml-2 hidden h-[3.75rem] w-14 sm:block"
+                    >
+                      <path
+                        d="M3 3 L11 21 M20 27 L38 38 M30 56 L54 56"
+                        fill="none"
+                        stroke="#111"
+                        strokeWidth="4.5"
+                        strokeLinecap="round"
+                      />
+                    </svg>
+                  )}
                 </p>
               </>
             ) : (
@@ -163,9 +234,9 @@ const Navbar = ({
                 </p>
               </>
             )}
-          {subtitle && (
+          {headingSubtitle && (
             <p className="text-[clamp(0.8rem,1vw,1rem)] font-medium leading-snug">
-              {subtitle}
+              {headingSubtitle}
             </p>
           )}
         </div>

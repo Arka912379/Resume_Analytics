@@ -19,9 +19,9 @@ import {
 //
 // The "WELCOME BACK, JOB FINDER" heading, bell and user chip come from the
 // existing fixed <Navbar />, so this file only draws the content below them.
-// On desktop the page is fixed to the screen: the green banner stays put and
-// only the list of job cards scrolls. "Read More" opens the full details over a
-// lightly blurred background.
+// The whole page scrolls as one: the green banner and the job cards move
+// together, nothing in this file is fixed to the screen. "Read More" opens the
+// full details over a lightly blurred background.
 //
 // Sections in this file (top to bottom):
 //   1. Page content (data)   2. ProfileSummaryBanner   3. JobCard
@@ -395,7 +395,7 @@ function ProfileSummaryBanner({ profile, avatarUrl, className = '' }) {
   return (
     <section
       aria-label="Your profile summary"
-      className={`flex flex-col gap-5 border-2 border-[#111] bg-[#5fdc98] p-5 shadow-[10px_10px_0_#111] sm:flex-row sm:items-stretch sm:gap-0 sm:p-6 lg:py-[clamp(1rem,2.4vh,1.5rem)] ${className}`}
+      className={`flex flex-col gap-5 border-2 border-[#111] bg-[#5fdc98] p-5 shadow-[10px_10px_0_#111] sm:flex-row sm:items-stretch sm:gap-0 sm:p-6 ${className}`}
     >
       <div className="flex shrink-0 items-center justify-center sm:pr-6">
         <div className="grid h-28 w-28 place-items-center overflow-hidden rounded-full border-[3px] border-[#111] bg-[#b290ff] sm:h-32 sm:w-32 lg:h-[clamp(7rem,9vw,9.5rem)] lg:w-[clamp(7rem,9vw,9.5rem)]">
@@ -422,7 +422,7 @@ function ProfileSummaryBanner({ profile, avatarUrl, className = '' }) {
           ))}
         </ul>
 
-        <p className="mt-3 text-base leading-snug sm:text-lg lg:mt-[clamp(0.5rem,1.4vh,0.75rem)] lg:text-[clamp(1rem,1.5vw,1.5rem)]">
+        <p className="mt-3 text-base leading-snug sm:text-lg lg:text-[clamp(1rem,1.5vw,1.5rem)]">
           <span className="font-extrabold text-[#6b2bf0]">Resume Summary:</span>{' '}
           <span aria-hidden="true">|</span> {profile.summary}
         </p>
@@ -703,6 +703,7 @@ function JobDetailsModal({ job, onClose }) {
 // 5. Page
 // ---------------------------------------------------------------------------
 // dot grid + staircase from the reference (desktop only, purely decorative)
+// They sit at the top of the page and scroll away with it.
 function Decorations() {
   return (
     <>
@@ -725,21 +726,21 @@ function Decorations() {
   )
 }
 
+// The whole page scrolls as one piece: there is no fixed height and no inner
+// scroll area. (overflow-x-clip only hides sideways overflow of the decorations,
+// it does not create a scroll container.)
 export default function JobFinder() {
   const { profile, jobs } = jobFinderData
   const [selectedJob, setSelectedJob] = useState(null)
 
   return (
-    <div className="relative isolate flex min-h-screen w-full min-w-0 flex-1 flex-col overflow-hidden bg-[#f7f7f7] px-4 pb-6 pt-36 text-[#111] sm:px-6 lg:h-screen lg:pb-0 lg:pt-[160px]">
+    <div className="relative isolate flex min-h-screen w-full min-w-0 flex-1 flex-col overflow-x-clip bg-[#f7f7f7] px-4 pb-12 pt-36 text-[#111] sm:px-6 lg:pt-[160px]">
       <Decorations />
 
-      <div className="relative z-10 flex flex-col gap-10 lg:min-h-0 lg:flex-1 lg:gap-[clamp(1.75rem,5vh,3.25rem)]">
-        <ProfileSummaryBanner profile={profile} className="shrink-0" />
+      <div className="relative z-10 flex flex-col gap-10 lg:gap-12">
+        <ProfileSummaryBanner profile={profile} />
 
-        <section
-          aria-label="Job recommendations"
-          className="pb-2 pr-3 pt-1 lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:pb-8 [scrollbar-color:#111_#efefef] [scrollbar-width:thin] [&::-webkit-scrollbar]:w-2.5 [&::-webkit-scrollbar-thumb]:bg-[#111] [&::-webkit-scrollbar-track]:bg-[#efefef]"
-        >
+        <section aria-label="Job recommendations" className="pb-2 pr-2 pt-1">
           {jobs.length === 0 ? (
             <p className="border-2 border-[#111] bg-white p-6 text-center font-bold shadow-[8px_8px_0_#111]">
               No job recommendations yet.

@@ -8,13 +8,14 @@ import InterviewResults from '../components/InterviewResults.jsx'
 import InterviewTopBar from '../components/InterviewTopBar.jsx'
 import QuestionPanel from '../components/QuestionPanel.jsx'
 import ReadyPanel from '../components/ReadyPanel.jsx'
+import ResultsDecorations from '../components/ResultsDecorations.jsx'
 import SetupSteps, { steps } from '../components/SetupSteps.jsx'
 import VideoStage from '../components/VideoStage.jsx'
 
 // ===========================================================================
 // InterviewPage.jsx - state and logic of the whole interview flow:
 //   setup (5 device checks) -> guidelines -> ready -> live -> ended -> results
-// UI lives in reusable components. This page owns interview state and flow.
+// All UI lives in components/interview/*. Logic is unchanged.
 // ===========================================================================
 
 const initialChecks = Object.fromEntries(steps.map(({ id }) => [id, { status: 'pending', detail: '', info: '' }]))
@@ -424,8 +425,9 @@ export default function InterviewPage() {
   const inSession = stage === 'guidelines' || stage === 'ready' || stage === 'live'
 
   return (
-    <section className={`relative min-h-full px-3 pb-4 pt-3 text-[#111] sm:px-4 md:px-5 lg:px-6 ${stage === 'setup' ? 'bg-[#fffeFB]' : 'bg-[#f5f3ed]'} ${inSession ? 'overflow-hidden' : ''}`}>
+    <section className={`relative min-h-full px-3 pb-4 pt-3 text-[#111] sm:px-4 md:px-5 lg:px-6 ${stage === 'setup' || stage === 'results' ? 'bg-[#fffeFB]' : 'bg-[#f5f3ed]'} ${inSession ? 'overflow-hidden' : ''}`}>
       {inSession && <InterviewDecorations />}
+      {stage === 'results' && <ResultsDecorations />}
 
       <div className={`relative ${showGuide ? 'pointer-events-none select-none blur-[3px]' : ''}`} aria-hidden={showGuide}>
         {stage === 'setup' && (
@@ -451,10 +453,7 @@ export default function InterviewPage() {
             {stage === 'ended' ? (
               <InterviewEnded duration={duration} />
             ) : stage === 'results' ? (
-              <>
-                <InterviewTopBar status="ended" interviewTitle={INTERVIEW_TITLE} showStatus={false} showDuration={false} durationLabel={duration} />
-                <InterviewResults endedAt={endedAt} duration={duration} />
-              </>
+              <InterviewResults endedAt={endedAt} duration={duration} />
             ) : (
               <>
                 <InterviewTopBar status={stage} interviewTitle={INTERVIEW_TITLE} durationLabel={duration} />

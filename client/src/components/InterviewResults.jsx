@@ -1,150 +1,226 @@
-import { CalendarDays, CheckCircle2, Lightbulb, ShieldAlert, Timer } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
+import Navbar, { useHideLayoutNavbar } from './Navbar.jsx'
+import InterviewMetaCard from './InterviewMetaCard.jsx'
+import OverallScoreCard from './OverallScoreCard.jsx'
+import RecommendationsCard from './RecommendationsCard.jsx'
+import ResultsDecorations from './ResultsDecorations.jsx'
+import SkillBreakdownCard from './SkillBreakdownCard.jsx'
+import StrengthsCard from './StrengthsCard.jsx'
+import WeaknessesCard from './WeaknessesCard.jsx'
 
-// Results summary shown after "Interview Ended".
-// Props: endedAt (Date | null), duration ('18:42')
-// Optional: scores = { overall, technical, communication, problemSolving, resume } (0-100)
-//           -> when a score is given its ring fills; otherwise the ring shows "not evaluated".
+// ===========================================================================
+// InterviewResults.jsx - the "Interview Results" page.
+//
+// Route:  <Route path="/interview-results" element={<InterviewResults />} />
+//         (any address works, e.g. results shown at /interview: the page sets its
+//          own heading and hides the layout's navbar while it is on screen)
+//
+// RESPONSIVE, ONE SCREEN:
+//   - wide screens ("fit" mode): the page is exactly one screen high and never
+//     scrolls. The boxes stretch to the full width (left edge = heading, right
+//     edge = the margin with the decorations) and the whole stage is scaled so
+//     every box, including Recommendations, is visible.
+//   - narrow / very small windows ("flow" mode): the boxes stack in one or two
+//     columns and the page scrolls normally, so text never gets unreadably small.
+//
+// The heading bar ("INTERVIEW RESULTS", subtitle, bell, user) is drawn here with
+// <Navbar inline title=... />.
+//
+// Each box is its own component in components/interview-results/:
+//   InterviewMetaCard, OverallScoreCard, SkillBreakdownCard,
+//   StrengthsCard, WeaknessesCard, RecommendationsCard (+ ResultsDecorations)
+//
+// Pass real data with <InterviewResults results={...} /> (same shape as below).
+// ===========================================================================
+const MIN_STAGE_W = 860 // narrowest stage drawn in "fit" mode
+const WIDE_FROM = 820 // from this width on the boxes use the desktop arrangement
+const MIN_SCALE = 0.62 // below this the page switches to normal scrolling
+const MAX_SCALE = 1.25
+const BOTTOM_GAP = 24 // free space kept under the last box
 
-// brand colours (same as the upload page / ATS score card)
-const INK = '#111111'
-const PURPLE = '#8e6cfd'
-const LILAC = '#b290ff'
-const MINT = '#5fdc98'
-const YELLOW = '#fed62a'
-const PINK = '#fd6c82'
-const ARC = '#7c5cff'
-
-const SKILLS = [
-  { key: 'technical', label: 'Technical Knowledge', color: ARC, tint: '#d9ceff' },
-  { key: 'communication', label: 'Communication', color: '#2fc97f', tint: '#c3f2d9' },
-  { key: 'problemSolving', label: 'Problem Solving', color: '#f5c400', tint: '#ffefa0' },
-  { key: 'resume', label: 'Resume Knowledge', color: PINK, tint: '#ffcfd7' },
-]
-
-function verdictFor(score) {
-  if (score >= 80) return { label: 'Excellent', color: LILAC }
-  if (score >= 65) return { label: 'Good', color: YELLOW }
-  if (score >= 50) return { label: 'Fair', color: '#ffb86b' }
-  return { label: 'Needs work', color: PINK }
+const interviewResultsData = {
+  interviewDate: 'Oct 06, 2026',
+  duration: '18:42 mins',
+  overallScore: 50,
+  skills: [
+    { id: 'technical', label: 'Technical Knowledge', score: 48 },
+    { id: 'communication', label: 'Communication', score: 68 },
+    { id: 'problem-solving', label: 'Problem Solving', score: 45 },
+    { id: 'resume', label: 'Resume Knowledge', score: 50 },
+  ],
+  strengths: [
+    'Clear, structured verbal presentation and polite communication style throughout the interview.',
+    'Good high-level conceptual understanding of technology selection trade-offs (e.g., Java/Spring Boot vs. Node.js/Express.js).',
+    'Solid breadth of modern project exposure including WebSockets, AI integrations (Gemini), and basic full-stack tools.',
+    'Demonstrates active enthusiasm for hands-on project building and competitive programming (200+ LeetCode problems solved).',
+  ],
+  weaknesses: [
+    'Tendency to restate surface-level resume bullet points rather than providing low-level technical execution details when prompted.',
+    'Lacks depth on critical backend topics such as custom rate-limiting algorithms, concurrency control mechanisms, and secure payment integration workflows.',
+    'Skipped the hard technical question regarding RAG architecture and multi-source data ingestion.',
+    'Vague responses on soft skills and leadership achievements without providing concrete scenarios or data-driven examples.',
+  ],
+  recommendations: [
+    'Deep-dive into the technical implementation details of projects listed on the resume, prepared to explain specific algorithms, data structures, and design patterns used.',
+    'Practice explaining core backend engineering topics mathematically and architectural-wise, such as distributed locks, token bucket rate limiters, and cryptographically secure token/key exchanges.',
+    'Adapt the STAR (Situation, Task, Action, Result) method for behavioral and experience-based questions to provide concrete evidence of leadership and problem-solving.',
+    'Work on technical deep dives into AI/RAG patterns (e.g., chunking strategies, vector embeddings, dynamic tool routing) before listing them prominently on the resume.',
+  ],
 }
 
-// round score ring: black frame, coloured track, coloured arc, value in the middle
-function Ring({ value, size, stroke, color, track, children }) {
-  const hasValue = typeof value === 'number' && Number.isFinite(value)
-  const percent = hasValue ? Math.min(100, Math.max(0, value)) : 0
-  const radius = (size - stroke) / 2 - 2
-  const circumference = 2 * Math.PI * radius
-  const center = size / 2
+export default function InterviewResults({ results = interviewResultsData }) {
+  const { interviewDate, duration, overallScore, skills, strengths, weaknesses, recommendations } = results
+
+  useHideLayoutNavbar() // this page draws its own heading bar
+
+  const rootRef = useRef(null)
+  const areaRef = useRef(null)
+  const stageRef = useRef(null)
+  const [layout, setLayout] = useState({ ready: false, mode: 'fit', scale: 1, wide: true, rootH: 0 })
+
+  // Work out how to show the stage: stretch it to the full width, then scale it
+  // (height decides the scale) until every box fits under the heading bar.
+  useEffect(() => {
+    const root = rootRef.current
+    const area = areaRef.current
+    const stage = stageRef.current
+    if (!root || !area || !stage) return undefined
+
+    const update = () => {
+      // real, measured space: from the top of the free area to the bottom of the
+      // visible window (so anything above the page, e.g. a layout border, is respected)
+      const viewportH = document.documentElement.clientHeight || window.innerHeight
+      const rootH = Math.max(0, viewportH - Math.max(0, root.getBoundingClientRect().top))
+      const areaW = area.clientWidth
+      const areaH = viewportH - area.getBoundingClientRect().top - BOTTOM_GAP
+      if (areaW <= 0 || areaH <= 0) return
+
+      let next
+      if (areaW < MIN_STAGE_W) {
+        stage.style.width = ''
+        next = { ready: true, mode: 'flow', scale: 1, wide: areaW >= WIDE_FROM, rootH }
+      } else {
+        const maxByWidth = areaW / MIN_STAGE_W
+        // the stage is (areaW / scale) px wide, so its height depends on the scale
+        const measure = (scale) => {
+          stage.style.width = `${Math.max(MIN_STAGE_W, areaW / scale)}px`
+          return stage.offsetHeight
+        }
+
+        let scale = Math.min(MAX_SCALE, maxByWidth, 1)
+        let height = measure(scale)
+        for (let i = 0; i < 8; i += 1) {
+          const target = Math.min(MAX_SCALE, maxByWidth, areaH / height)
+          if (Math.abs(target - scale) < 0.003) break
+          scale = target
+          height = measure(scale)
+        }
+        if (scale * height > areaH + 0.5) {
+          scale = areaH / height
+          height = measure(scale)
+        }
+
+        if (scale < MIN_SCALE) {
+          stage.style.width = ''
+          next = { ready: true, mode: 'flow', scale: 1, wide: true, rootH }
+        } else {
+          next = { ready: true, mode: 'fit', scale, wide: true, rootH }
+        }
+      }
+
+      setLayout((prev) =>
+        prev.ready &&
+        prev.mode === next.mode &&
+        prev.wide === next.wide &&
+        Math.abs(prev.scale - next.scale) < 0.001 &&
+        prev.rootH === next.rootH
+          ? prev
+          : next
+      )
+    }
+
+    update()
+    const observer = new ResizeObserver(update)
+    observer.observe(area)
+    observer.observe(stage) // text re-wrapping (fonts loading) changes the stage height
+    window.addEventListener('resize', update)
+    document.fonts?.ready.then(update)
+
+    return () => {
+      observer.disconnect()
+      window.removeEventListener('resize', update)
+    }
+  }, [results])
+
+  const fit = layout.mode === 'fit'
+  const { wide } = layout
 
   return (
-    <div className="relative shrink-0" style={{ width: size, height: size }}>
-      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} aria-hidden="true" className="block">
-        <circle cx={center} cy={center} r={radius} fill="#fff" stroke={INK} strokeWidth={stroke + 4} />
-        <circle cx={center} cy={center} r={radius} fill="none" stroke={track} strokeWidth={stroke} />
-        {hasValue && percent > 0 && (
-          <circle
-            cx={center}
-            cy={center}
-            r={radius}
-            fill="none"
-            stroke={color}
-            strokeWidth={stroke}
-            strokeDasharray={`${(circumference * percent) / 100} ${circumference}`}
-            transform={`rotate(-90 ${center} ${center})`}
-          />
-        )}
-      </svg>
-      <div className="absolute inset-0 grid place-items-center">{children}</div>
-    </div>
-  )
-}
+    <div
+      ref={rootRef}
+      className={`relative isolate flex w-full min-w-0 flex-col bg-white text-[#111] ${
+        fit ? 'h-screen overflow-hidden' : 'min-h-screen overflow-x-hidden'
+      }`}
+      style={fit && layout.rootH ? { height: layout.rootH } : undefined}
+    >
+      <ResultsDecorations />
 
-export default function InterviewResults({ endedAt, duration, scores = {} }) {
-  const overall = typeof scores.overall === 'number' ? Math.round(scores.overall) : null
-  const verdict = overall === null ? null : verdictFor(overall)
+      {/* heading bar, drawn by the page: its left edge lines up with the boxes */}
+      <div className="relative z-20 shrink-0 pl-3 max-[720px]:pl-2">
+        <Navbar
+          inline
+          title="Interview Results"
+          subtitle="Here is your detailed performance analysis and personalized feedback."
+        />
+      </div>
 
-  return (
-    <section className="mx-auto w-full max-w-[1400px] flex-1 pb-4 text-[#111]">
-      <header className="mb-4 flex flex-wrap items-end justify-between gap-3 border-b-[3px] border-black pb-3">
-        <div>
-          <h1 className="inline-block border-[3px] border-black bg-[#8e6cfd] px-3 py-1 text-2xl font-black uppercase leading-none shadow-[4px_4px_0_#111] sm:text-3xl">Interview Results</h1>
-          <p className="mt-2 text-sm font-semibold">Session summary. Performance analysis is not connected yet.</p>
-        </div>
-        <div className="flex items-center gap-3 border-[3px] border-black bg-[#fed62a] px-3 py-2 text-xs font-black shadow-[4px_4px_0_#111]">
-          <span className="inline-flex items-center gap-1.5"><CalendarDays aria-hidden="true" size={16} strokeWidth={2.5} />{endedAt ? endedAt.toLocaleDateString(undefined, { day: '2-digit', month: 'short', year: 'numeric' }) : 'Date unavailable'}</span>
-          <span aria-hidden="true" className="h-6 w-0.5 bg-black" />
-          <span className="inline-flex items-center gap-1.5"><Timer aria-hidden="true" size={16} strokeWidth={2.5} />{duration}</span>
-        </div>
-      </header>
-
-      <div className="grid gap-4 lg:grid-cols-[minmax(190px,0.28fr)_minmax(0,1fr)]">
-        <article className="border-[3px] border-black bg-[#5fdc98] p-3 shadow-[6px_6px_0_#111] sm:p-4">
-          <h2 className="text-center text-lg font-black uppercase tracking-wide">Overall Score</h2>
-          <div className="mt-3 flex justify-center">
-            <Ring value={overall} size={136} stroke={16} color={ARC} track={overall === null ? '#cdbdff' : '#f6f6f6'}>
-              <div className="text-center">
-                <span className="block text-4xl font-black leading-none">{overall === null ? '—' : overall}</span>
-                <span className="text-xs font-black">/ 100</span>
-              </div>
-            </Ring>
-          </div>
-          <p
-            className="mt-3 border-[3px] border-black px-2 py-1 text-center text-xs font-black uppercase shadow-[3px_3px_0_#111]"
-            style={{ backgroundColor: verdict ? verdict.color : LILAC }}
+      {/* free area under the heading bar; the right margin is kept for the decorations */}
+      <div className={`relative z-10 pl-5 pr-5 xl:pr-[76px] ${fit ? 'min-h-0 flex-1' : 'pb-8'}`}>
+        <div ref={areaRef} className="relative h-full w-full">
+          <div
+            ref={stageRef}
+            className={`flex flex-col gap-5 pb-2 pr-2 ${fit ? 'absolute left-0 top-0' : 'relative w-full'}`}
+            style={
+              fit
+                ? {
+                    transformOrigin: '0 0',
+                    transform: `scale(${layout.scale})`,
+                    opacity: layout.ready ? 1 : 0,
+                  }
+                : undefined
+            }
           >
-            {verdict ? verdict.label : 'Score not available'}
-          </p>
-        </article>
+            {/* date + duration (with the dot grid beside it) */}
+            <div className={`flex items-center gap-4 ${wide ? 'justify-end' : 'justify-start'}`}>
+              {wide && (
+                <span
+                  aria-hidden="true"
+                  className="h-[76px] w-[86px] shrink-0 bg-[radial-gradient(circle,#111_2px,transparent_2.6px)] [background-size:19px_19px]"
+                />
+              )}
+              <InterviewMetaCard date={interviewDate} duration={duration} />
+            </div>
 
-        <article className="border-[3px] border-black bg-white p-3 shadow-[6px_6px_0_#111] sm:p-4">
-          <div className="flex items-center justify-between gap-2">
-            <h2 className="text-lg font-black uppercase tracking-wide">Skill Breakdown</h2>
-            <span className="border-2 border-black bg-[#fed62a] px-2 py-0.5 text-[0.68rem] font-black">Score out of 100</span>
+            {/* overall score + skill breakdown */}
+            <div
+              className={`grid gap-[18px] ${
+                wide ? 'grid-cols-[minmax(240px,22.5%)_minmax(0,1fr)]' : 'grid-cols-1'
+              }`}
+            >
+              <OverallScoreCard score={overallScore} />
+              <SkillBreakdownCard skills={skills} compact={!wide} />
+            </div>
+
+            {/* strengths + weaknesses */}
+            <div className={`grid gap-5 ${wide ? 'grid-cols-[minmax(0,49fr)_minmax(0,51fr)]' : 'grid-cols-1'}`}>
+              <StrengthsCard items={strengths} />
+              <WeaknessesCard items={weaknesses} />
+            </div>
+
+            <RecommendationsCard items={recommendations} />
           </div>
-          <div className="mt-3 grid grid-cols-2 divide-y-[3px] divide-black sm:grid-cols-4 sm:divide-x-[3px] sm:divide-y-0">
-            {SKILLS.map((skill) => {
-              const value = typeof scores[skill.key] === 'number' ? Math.round(scores[skill.key]) : null
-
-              return (
-                <div key={skill.key} className="flex flex-col items-center justify-center px-2 py-2 text-center">
-                  <h3 className="min-h-9 text-xs font-black leading-tight">{skill.label}</h3>
-                  <div className="my-1">
-                    <Ring value={value} size={64} stroke={8} color={skill.color} track={skill.tint}>
-                      <span className="text-lg font-black">{value === null ? '—' : value}</span>
-                    </Ring>
-                  </div>
-                  <span
-                    className="border-2 border-black px-2 py-0.5 text-[0.62rem] font-black shadow-[2px_2px_0_#111]"
-                    style={{ backgroundColor: skill.tint }}
-                  >
-                    {value === null ? 'Not evaluated' : `${value} / 100`}
-                  </span>
-                </div>
-              )
-            })}
-          </div>
-        </article>
+        </div>
       </div>
-
-      <div className="mt-4 grid gap-4 md:grid-cols-2">
-        <article className="border-[3px] border-black bg-[#5fdc98] p-3 shadow-[6px_6px_0_#111] sm:p-4">
-          <h2 className="flex items-center gap-2 text-base font-black uppercase tracking-wide"><CheckCircle2 aria-hidden="true" strokeWidth={2.75} />Strengths</h2>
-          <div className="mt-2 border-t-2 border-black pt-2 text-sm font-semibold">No strengths were assessed. An interview evaluation service is not connected.</div>
-        </article>
-        <article className="border-[3px] border-black bg-[#fd6c82] p-3 shadow-[6px_6px_0_#111] sm:p-4">
-          <h2 className="flex items-center gap-2 text-base font-black uppercase tracking-wide"><ShieldAlert aria-hidden="true" strokeWidth={2.75} />Areas to Review</h2>
-          <div className="mt-2 border-t-2 border-black pt-2 text-sm font-semibold">No areas for improvement were assessed. No performance feedback has been generated.</div>
-        </article>
-      </div>
-
-      <article className="mt-4 border-[3px] border-black bg-[#fed62a] p-3 shadow-[6px_6px_0_#111] sm:p-4">
-        <h2 className="flex items-center gap-2 text-base font-black uppercase tracking-wide"><Lightbulb aria-hidden="true" strokeWidth={2.75} />Recommendations</h2>
-        <ul className="mt-2 space-y-1.5 border-t-2 border-black pt-2 text-sm font-semibold">
-          <li className="flex gap-2"><span className="font-black">•</span><span>Review your responses and note any topics you would like to practice further.</span></li>
-          <li className="flex gap-2"><span className="font-black">•</span><span>Practice explaining your approach with clear examples and a concise structure.</span></li>
-          <li className="flex gap-2"><span className="font-black">•</span><span>Personalized recommendations will appear here when interview evaluation is connected.</span></li>
-        </ul>
-      </article>
-    </section>
+    </div>
   )
 }
